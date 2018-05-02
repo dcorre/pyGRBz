@@ -1,0 +1,29 @@
+##Taken from https://arxiv.org/abs/1412.6530 
+#name:GRB140419A
+#type:sed
+#RA_J2000:08h28m00.4s
+#DEC_J2000:+46d14m03.7s
+#MW_corr:0
+#time_since_burst:-99
+##zspec
+#z:3.956
+#zph:>2.8
+#zph_sup:-99
+#zph_inf:-99
+#Av_host:0.11
+#Av_host_sup:0.06
+#Av_host_inf:0.05
+#ext_type:SMC
+#beta:0.61
+#beta_sup:0.01
+#beta_inf:0.01
+#beta_X:1.05
+#beta_X_sup:0.07
+#beta_X_inf:0.07
+band mag mag_err zp phot_sys detection telescope
+r 17.65 0.17 - AB 1 ratir
+i 17.30 0.12 - AB 1 ratir
+Z 16.91 0.09 - AB 1 ratir
+Y 16.76 0.08 - AB 1 ratir
+J 17.19 0.11 - AB 1 ratir
+H 16.57 0.07 - AB 1 ratir

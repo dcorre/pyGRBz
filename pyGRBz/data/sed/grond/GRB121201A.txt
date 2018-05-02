@@ -1,0 +1,30 @@
+##Taken from http://www.mpe.mpg.de/~jcg/grb121201A.html
+#name:GRB121201A
+#type:sed
+#RA_J2000:00h53m53.6s
+#DEC_J2000:-42d55m45.9s
+#MW_corr:0
+#time_since_burst:43200
+##it is a zpsec
+#z:3.385
+#zph:3.6
+#zph_sup:0.2
+#zph_inf:0.3
+#Av_host:-99
+#Av_host_sup:-99
+#Av_host_inf:-99 
+#ext_type:inconnu
+#beta:-99
+#beta_sup:-99
+#beta_inf:-99
+#beta_X:-99
+#beta_X_sup:-99
+#beta_X_inf:-99
+band mag mag_err zp phot_sys ABcorr detection telescope
+g 24.2 0.2 - AB -99 1 grond
+r 23.0 0.1 - AB -99 1 grond
+i 22.7 0.1 - AB -99 1 grond
+z 22.5 0.1 - AB -99 1 grond
+J 21.5 0.05 - AB 0.91 0 grond
+H 21.0 0.05 - AB 1.38 0 grond
+Ks 19.9 0.05 - AB 1.81 0 grond

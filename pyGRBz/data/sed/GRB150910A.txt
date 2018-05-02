@@ -1,0 +1,30 @@
+##Taken from http://www.mpe.mpg.de/~jcg/grb150910A.html
+#name:GRB150910A
+#type:sed
+#RA_J2000:+00h22m42s
+#DEC_J2000:+33d29m55s
+#MW_corr:0
+#time_since_burst: 74880
+#z:1.359
+#zph:-99
+#zph_sup:-99
+#zph_inf:-99
+##Dust from https://arxiv.org/abs/1101.1503
+#Av_host:-99
+#Av_host_sup:-99
+#Av_host_inf:-99 
+#ext_type:inconnu
+#beta:-99
+#beta_sup:-99
+#beta_inf:-99
+#beta_X:-99
+#beta_X_sup:-99
+#beta_X_inf:-99
+band mag mag_err zp phot_sys detection telescope
+g 21.5 0.2 - AB 1 grond
+r 21.2 0.2 - AB 1 grond
+i 21.0 0.2 - AB 1 grond
+z 20.8 0.2 - AB 1 grond
+J 19.8 0.05 - AB 0 grond
+H 19.3 0.05 - AB 0 grond
+Ks 18.1 0.05 - AB 0 grond

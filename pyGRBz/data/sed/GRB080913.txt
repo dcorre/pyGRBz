@@ -1,0 +1,30 @@
+##Taken from http://iopscience.iop.org/article/10.1088/0004-637X/693/2/1610/pdf
+#name:GRB080913
+#type:sed
+#RA_J2000:+04h22m54s
+#DEC_J2000:-25d06m36s
+#MW_corr:0
+#time_since_burst:600
+#z:6.695
+#zph:6.44
+#zph_sup:0.3
+#zph_inf:0.3
+##Dust from https://arxiv.org/abs/1101.1503
+#Av_host:0.12
+#Av_host_sup:0.03
+#Av_host_inf:0.03 
+#ext_type:inconnu
+#beta:1.12
+#beta_sup:0.16
+#beta_inf:0.16
+#beta_X:-99
+#beta_X_sup:-99
+#beta_X_inf:-99
+band mag mag_err zp phot_sys detection telescope
+g 23.3 0.05 - AB 0 grond
+r 23.6 0.05 - AB 0 grond
+i 23.0 0.05 - AB 0 grond
+z 21.71 0.11 - AB 1 grond
+J 19.96 0.03 - AB 1 grond
+H 19.64 0.05 - AB 1 grond
+Ks 19.17 0.11 - AB 1 grond

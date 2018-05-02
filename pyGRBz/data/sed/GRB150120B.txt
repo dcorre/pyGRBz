@@ -1,0 +1,31 @@
+##Taken http://www.mpe.mpg.de/~jcg/grb150120B.html
+#name:GRB150120B
+#type:sed
+#RA_J2000:02h37m09.77s
+#DEC_J2000:+08d04m40.49s
+##MW_corr:1 -> already corrected / 0 not corrected
+#MW_corr:0
+#time_since_burst:64800
+#z:3.5
+##no zspec it is a zph
+#zph:3.5
+#zph_sup:0.5
+#zph_inf:0.5
+#Av_host:-99
+#Av_host_sup:-99
+#Av_host_inf:-99 
+#ext_type:inconnu
+#beta:-99
+#beta_sup:-99
+#beta_inf:-99
+#beta_X:-99
+#beta_X_sup:-99
+#beta_X_inf:-99
+band mag mag_err zp phot_sys detection telescope
+g 24.2 0.05 - AB 0 grond
+r 23.6 0.1 - AB 1 grond
+i 22.7 0.2 - AB 1 grond
+z 22.4 0.4 - AB 1 grond
+J 20.2 0.3 - AB 1 grond
+H 19.9 0.5 - AB 1 grond
+Ks 18.7 0.4 - AB 1 grond

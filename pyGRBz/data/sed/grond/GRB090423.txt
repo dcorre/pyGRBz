@@ -1,0 +1,29 @@
+##Taken from http://gcn.gsfc.nasa.gov/gcn/gcn3/9215.gcn3
+#name:GRB090423
+#type:sed
+#RA_J2000:09h55m33.08s
+#DEC_J2000:+18d08m58.9s
+#MW_corr:0
+#time_since_burst:60120.0
+#z:8.2
+#zph:8
+#zph_sup:0.5
+#zph_inf:1.2
+#Av_host:0.
+#Av_host_sup:0.0
+#Av_host_inf:0.0 
+#ext_type:none
+#beta:1.0
+#beta_sup:0.4
+#beta_inf:0.5
+#beta_X:-99
+#beta_X_sup:-99
+#beta_X_inf:-99
+band mag mag_err zp phot_sys detection ABcorr telescope
+g 25.0 0.05 - AB 0 -99 grond
+r 25.1 0.05 - AB 0 -99 grond
+i 24.2 0.05 - AB 0 -99 grond
+z 24.0 0.05 - AB 0 -99 grond
+J 21.6 0.1 - AB 1 0.91 grond
+H 21.2 0.1 - AB 1 1.38 grond
+Ks 20.9 0.1 - AB 1 1.81 grond

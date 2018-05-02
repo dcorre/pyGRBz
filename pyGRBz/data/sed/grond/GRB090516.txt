@@ -1,0 +1,40 @@
+##Taken from http://www.mpe.mpg.de/~jcg/grb090516.html
+#name:GRB090516
+#type:sed
+#RA_J2000:09h13m2.52s
+#DEC_J2000:-11d51m15.9s
+#MW_corr:0
+#time_since_burst:52560
+##zspec
+#z:4.109
+#zph:4.1
+#zph_sup:0.3
+#zph_inf:0.3
+#Av_host:0.4
+#Av_host_sup:-99
+#Av_host_inf:-99 
+#ext_type:SMC
+#beta:-99
+#beta_sup:-99
+#beta_inf:-99
+#beta_X:-99
+#beta_X_sup:-99
+#beta_X_inf:-99
+##not added the 0.2 as systematic error in the absolute calibration using the GROND zero points and 2MASS field stars
+##band mag mag_err zp phot_sys ABcorr detection telescope
+##g 23.6 0.1 - AB -99 1 grond
+##r 21.44 0.1 - AB -99 1 grond
+##i 20.38 0.1 - AB -99 1 grond
+##z 19.95 0.1 - AB -99 1 grond
+##J 19.6 0.1 - AB 0.91 1 grond
+##H 19.2 0.1 - AB 1.38 1 grond
+##Ks 19.1 0.2 - AB 1.81 1 grond
+##adding the 0.2 systematic error in quadrature in the absolute calibration using the GROND zero points and 2MASS field stars
+band mag mag_err zp phot_sys ABcorr detection telescope
+g 23.6 0.22 - AB -99 1 grond
+r 21.44 0.22 - AB -99 1 grond
+i 20.38 0.22 - AB -99 1 grond
+z 19.95 0.22 - AB -99 1 grond
+J 19.6 0.22 - AB 0.91 1 grond
+H 19.2 0.22 - AB 1.38 1 grond
+Ks 19.1 0.28 - AB 1.81 1 grond

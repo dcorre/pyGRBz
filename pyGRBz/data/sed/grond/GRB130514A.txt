@@ -1,0 +1,28 @@
+##Taken at http://arxiv.org/pdf/1412.6530v2.pdf and http://www.mpe.mpg.de/~jcg/grb130514A.html
+#name:GRB130514A
+#type:sed
+#RA_J2000:+19h45m06s
+#DEC_J2000:-07d57m20s
+#MW_corr:0
+#z:3.6
+#time_since_burst:120
+#zph:3.6 
+#zph_sup:0.2
+#zph_inf:0.2
+#Av_host:-99
+#Av_host_sup:-99
+#Av_host_inf:-99
+#ext_type:inconnu
+#beta:0.22
+#beta_sup:0
+#beta_inf:-0.22
+#beta_X:1.4
+#beta_X_sup:0.36
+#beta_X_inf:0.32
+band mag mag_err zp phot_sys detection telescope
+g 22.17 0.09 - AB 1 grond
+r 19.98 0.01 - AB 1 grond
+i 19.18 0.02 - AB 1 grond
+J 17.87 0.03 - AB 1 grond
+H 17.26 0.03 - AB 1 grond
+Ks 16.81 0.03 - AB 1 grond

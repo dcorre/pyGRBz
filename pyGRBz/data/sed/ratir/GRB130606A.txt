@@ -1,0 +1,27 @@
+#name:GRB130606A
+#type:sed
+#RA_J2000:+16h37m37s
+#DEC_J2000:+29d47m27s
+#MW_corr:0
+#z:5.913
+#time_since_burst:27306
+#zph:5.90 
+#zph_sup:0.29
+#zph_inf:0.22
+#Av_host:0.03 
+#Av_host_sup:0.01
+#Av_host_inf:0.1
+#ext_type:SMC
+#beta:0.29
+#beta_sup:0.41
+#beta_inf:0.41
+#beta_X:-99
+#beta_X_sup:-99
+#beta_X_inf:-99
+band mag mag_err zp phot_sys detection telescope
+r 23.02 0.05 - AB 0 ratir
+i 21.16 0.06 - AB 1 ratir
+Z 18.79 0.03 - AB 1 ratir
+Y 18.40 0.03 - AB 1 ratir
+J 18.32 0.03 - AB 1 ratir
+H 17.92 0.03 - AB 1 ratir

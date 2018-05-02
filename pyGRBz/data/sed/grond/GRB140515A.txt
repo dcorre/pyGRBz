@@ -1,0 +1,30 @@
+##Taken from http://www.mpe.mpg.de/~jcg/grb140515A.html
+#name:GRB140515A
+#type:sed
+#RA_J2000:12h24m15.48s
+#DEC_J2000:+15d06m17.7s
+#MW_corr:0
+#time_since_burst:61200
+##it is a zpsec
+#z:6.32
+#zph:6.5
+#zph_sup:0.2
+#zph_inf:0.2
+#Av_host:-99
+#Av_host_sup:-99
+#Av_host_inf:-99 
+#ext_type:inconnu
+#beta:-99
+#beta_sup:-99
+#beta_inf:-99
+#beta_X:-99
+#beta_X_sup:-99
+#beta_X_inf:-99
+band mag mag_err zp phot_sys ABcorr detection telescope
+g 24.1 0.05 - AB -99 0 grond
+r 24.5 0.05 - AB -99 0 grond
+i 24.2 0.05 - AB -99 0 grond
+z 22.1 0.1 - AB -99 1 grond
+J 20.9 0.2 - AB 0.91 1 grond
+H 20.9 0.2 - AB 1.38 1 grond
+Ks 19.1 0.05 - AB 1.81 0 grond

@@ -1,0 +1,6 @@
+# Taken at http://w3.caha.es/alises/cafos/cafos22.html
+# nm trans
+479.0 0.0
+480.0 100.0
+820.0 100.0
+821.0 0.0

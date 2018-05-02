@@ -1,0 +1,29 @@
+##Taken from http://arxiv.org/pdf/1011.1205.pdf, no zspec found so z is set to zphot
+#name:GRB081228
+#type:sed
+#RA_J2000:+13h57m07s
+#DEC_J2000:-68d56m33s
+#MW_corr:0
+#time_since_burst:2588.4
+#z:3.44
+#zph:3.44
+#zph_sup:0.15
+#zph_inf:0.32
+#Av_host:0.03
+#Av_host_sup:0.17
+#Av_host_inf:0.03 
+#ext_type:SMC
+#beta:1.2
+#beta_sup:0.1
+#beta_inf:0.5
+#beta_X:-99
+#beta_X_sup:-99
+#beta_X_inf:-99
+band mag mag_err zp phot_sys ABcorr detection telescope
+g 22.10 0.14 - AB -99 1 grond
+r 20.79 0.04 - AB -99 1 grond
+i 20.30 0.05 - AB -99 1 grond
+z 20.12 0.08 - AB -99 1 grond
+J 18.64 0.14 - vega 0.91 1 grond
+H 17.63 0.14 - vega 1.38 1 grond
+K 16.87 0.15 - vega 1.81 1 grond

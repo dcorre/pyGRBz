@@ -1,0 +1,28 @@
+##Taken from http://arxiv.org/pdf/1412.6530.pdf
+#name:GRB130327A
+#type:sed
+#RA_J2000:2h54m00.73s
+#DEC_J2000:+13d23m43.0s
+#MW_corr:0
+#time_since_burst:4260
+#z:3.9
+#zph:<3.9
+#zph_sup:-99
+#zph_inf:-99
+#Av_host:0.12
+#Av_host_sup:0.19
+#Av_host_inf:0.43
+#ext_type:MW
+#beta:0.64
+#beta_sup:0.13
+#beta_inf:0.13
+#beta_X=1
+#beta_X_sup=0.34
+#beta_X=0.3
+band mag mag_err zp phot_sys detection telescope
+r 21.01 0.01 - AB 1 ratir
+i 20.66 0.09 - AB 1 ratir
+Z 20.20 0.12 - AB 1 ratir
+Y 20.02 0.15 - AB 1 ratir
+J 19.89 0.18 - AB 1 ratir
+#H 20.56 0.41 - AB 1 ratir

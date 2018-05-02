@@ -1,0 +1,6 @@
+# Values from http://ratir.astroscu.unam.mx/public/wiki/Filters
+# wavelength(nm)    transmittance
+969.0 0.0
+970.0 31.0
+1070.0 31.0
+1071.0 0.0
