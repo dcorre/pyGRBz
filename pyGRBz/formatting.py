@@ -166,44 +166,5 @@ def formatting_data(data,system_response,grb_info,wavelength,dustrecalib='yes',d
     data.sort(['Name','eff_wvl'])
     return data
 
-"""
-def output_params(grb_param_file,file_notdetected):
 
-    grb_par=ascii.read(grb_param_file+'.tex')
-    grb_not_detected=ascii.read(file_not_detected+'.dat')
-
-
-    col_det=Column(name='det',data=np.ones(len(grb_par),dtype=int))
-    grb_par.add_columns([col_det])
-"""
-
-def results_stat(filename,nb_detect_min,filtery):
-    from .utils import column
-
-    a=ascii.read(filename)
-    z=[0.,3.52,4.67,5.73,6.56,7.22,9.93,13.31]
-    if filtery : nb_filter=[7,7,5,4,3,2,1]
-    else: nb_filter=[6,6,4,3,2,2,1]
-    tab=[]
-    for i in range(len(z)-1):
-         #range
-         col1=str(z[i])+' - '+str(z[i+1])
-         #nb of samples within the range
-         col2=len(a[((a['z']>z[i]) & (a['z']<z[i+1]))])
-         #nb of samples detected
-         col3=len(a[((a['z']>z[i]) & (a['z']<z[i+1]) & (a['nb_detection']>0))])
-         #Nb of samples consistent with zsim
-         #col4=len((a[((a['z']>z[i]) & (a['z']<z[i+1]) & (a['nb_detection']>nb_detect_min) & ((a['zphot']+a['zphot_sup'] > a['z']) & (a['zphot']-a['zphot_inf'] < a['z'])))]['zphot_sup'] + a[((a['z']>z[i]) & (a['z']<z[i+1]) & (a['nb_detection']>nb_detect_min) & ((a['zphot']+a['zphot_sup'] > a['z']) & (a['zphot']-a['zphot_inf'] < a['z'])))]['zphot_inf']))
-         col4=len((a[((a['z']>z[i]) & (a['z']<z[i+1]) & (a['nb_detection']==nb_filter[i]) & ((a['zphot']+a['zphot_sup'] > a['z']) & (a['zphot']-a['zphot_inf'] < a['z'])))]['zphot_sup'] + a[((a['z']>z[i]) & (a['z']<z[i+1]) & (a['nb_detection']==nb_filter[i]) & ((a['zphot']+a['zphot_sup'] > a['z']) & (a['zphot']-a['zphot_inf'] < a['z'])))]['zphot_inf']))
-         #Mean delta_z when zphot consistent with zsim
-         if col4>0:
-              #col5=round(100*np.mean((a[((a['z']>z[i]) & (a['z']<z[i+1]) & (a['nb_detection']>nb_detect_min) & ((a['zphot']+a['zphot_sup'] > a['z']) & (a['zphot']-a['zphot_inf'] < a['z'])))]['zphot_sup'] + a[((a['z']>z[i]) & (a['z']<z[i+1]) & (a['nb_detection']>nb_detect_min) & ((a['zphot']+a['zphot_sup'] > a['z']) & (a['zphot']-a['zphot_inf'] < a['z'])))]['zphot_inf'])))*1e-2
-              col5=round(100*np.mean((a[((a['z']>z[i]) & (a['z']<z[i+1]) & (a['nb_detection']==nb_filter[i]) & ((a['zphot']+a['zphot_sup'] > a['z']) & (a['zphot']-a['zphot_inf'] < a['z'])))]['zphot_sup'] + a[((a['z']>z[i]) & (a['z']<z[i+1]) & (a['nb_detection']==nb_filter[i]) & ((a['zphot']+a['zphot_sup'] > a['z']) & (a['zphot']-a['zphot_inf'] < a['z'])))]['zphot_inf'])))*1e-2
-         else:
-              col5='-'
-         if col3>0: tab.append([col1,col2,col3,str(col4)+' ( '+str(1e-2*round(col4/col3*100*100))+' %)',col5])
-         else: tab.append([col1,col2,col3,col4,col5])
-    b=Table([column(tab,0),column(tab,1),column(tab,2),column(tab,3),column(tab,4)],names=['range','nb total samples','nb samples detected','nb samples consitent with zsim', 'Mean 1sig uncertainty'])
-    print (b)
-    ascii.write(b,'test.latex',format='latex') 
 
