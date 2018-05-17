@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 # Licensed under a 3-clause BSD style license - see LICENSE.rst
+# Original file comes from sncosmo
 """Functions for reading GRB light curves. Adapted from Python module 'sncosmo'"""
 
 from __future__ import print_function
@@ -8,7 +9,6 @@ from warnings import warn
 import os
 import sys
 import re
-import json
 from collections import OrderedDict as odict
 
 import numpy as np
@@ -103,22 +103,8 @@ def _read_ascii(f, **kwargs):
 
 
 # -----------------------------------------------------------------------------
-# Reader: json
-def _read_json(f, **kwargs):
-    t = json.load(f)
-
-    # Encode data keys as ascii rather than UTF-8 so that they can be
-    # used as numpy structured array names later.
-    d = {}
-    for key, value in t['data'].items():
-        d[key] = value
-    return t['meta'], d
-
-
-# -----------------------------------------------------------------------------
 # All readers
-READERS = {'ascii': _read_ascii,
-           'json': _read_json}
+READERS = {'ascii': _read_ascii}
 
 
 def read_lc(file_or_dir, format='ascii', **kwargs):
@@ -127,12 +113,12 @@ def read_lc(file_or_dir, format='ascii', **kwargs):
     Parameters
     ----------
     file_or_dir : str
-        Filename (formats 'ascii', 'json', 'salt2') or directory name
+        Filename (formats 'ascii', 'salt2') or directory name
         (format 'salt2-old'). For 'salt2-old' format, directory must contain
         a file named 'lightfile'. All other files in the directory are
         assumed to be photometry files, unless the `filenames` keyword argument
         is set.
-    format : {'ascii', 'json', 'salt2', 'salt2-old'}, optional
+    format : {'ascii', 'salt2', 'salt2-old'}, optional
         Format of file. Default is 'ascii'. 'salt2' is the new format available
         in snfit version >= 2.3.0.
     delim : str, optional
