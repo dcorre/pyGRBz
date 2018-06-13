@@ -61,7 +61,7 @@ extensions = [
     #'sphinx.ext.linkcode',
     'numpydoc',
     'sphinxcontrib.programoutput',
-    matplotlib.sphinxext.plot_directive.__name__
+    #matplotlib.sphinxext.plot_directive.__name__
 ]
 # Add any paths that contain templates here, relative to this directory.
 templates_path = ['_templates']
