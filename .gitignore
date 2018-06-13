@@ -117,4 +117,4 @@ ENV/
 *.bk
 
 # Exclude results folder
-pyGRBz/results/
+pyGRBz/results/*
