@@ -21,7 +21,7 @@
 import os
 import sys
 sys.path.insert(0, os.path.abspath('..'))
-
+import matplotlib.sphinxext.plot_directive
 import pyGRBz
 
 # -- General configuration ---------------------------------------------
@@ -29,11 +29,40 @@ import pyGRBz
 # If your documentation needs a minimal Sphinx version, state it here.
 #
 # needs_sphinx = '1.0'
+"""
+# If your extensions are in another directory, add it here. If the
+# directory is relative to the documentation root, use
+# os.path.abspath to make it absolute, like shown here.
+sys.path.append(os.path.abspath('sphinxext'))
 
 # Add any Sphinx extension module names here, as strings. They can be
 # extensions coming with Sphinx (named 'sphinx.ext.*') or your custom ones.
-extensions = ['sphinx.ext.autodoc', 'sphinx.ext.viewcode']
-
+#extensions = ['sphinx.ext.autodoc', 'sphinx.ext.viewcode']
+extensions = [
+          'matplotlib.sphinxext.mathmpl',
+          'matplotlib.sphinxext.only_directives',
+          'matplotlib.sphinxext.plot_directive',
+          'matplotlib.sphinxext.ipython_directive',
+          'sphinx.ext.autodoc',
+          'sphinx.ext.doctest',
+          'ipython_console_highlighting',
+          'inheritance_diagram',
+          'numpydoc']
+"""
+# Add any Sphinx extension module names here, as strings. They can be
+# extensions coming with Sphinx (named 'sphinx.ext.*') or your custom
+# ones.
+extensions = [
+    'sphinx.ext.autodoc',
+    'sphinx.ext.autosummary',
+    'sphinx.ext.intersphinx',
+    'sphinx.ext.inheritance_diagram',
+    'sphinx.ext.mathjax',
+    #'sphinx.ext.linkcode',
+    'numpydoc',
+    'sphinxcontrib.programoutput',
+    matplotlib.sphinxext.plot_directive.__name__
+]
 # Add any paths that contain templates here, relative to this directory.
 templates_path = ['_templates']
 

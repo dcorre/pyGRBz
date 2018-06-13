@@ -1,14 +1,17 @@
 Welcome to pyGRBz's documentation!
 ======================================
 
+
+
+User Documentation
+==================
+
 .. toctree::
    :maxdepth: 2
-   :caption: Contents:
 
    readme
    installation
-   usage
-   modules
+   usage <usage.rst>
    contributing
    authors
    history

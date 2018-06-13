@@ -1,0 +1,18 @@
+Observations:
+Name      time_since_burst band  mag  mag_err  zp phot_sys detection telescope
+--------- ---------------- ---- ----- ------- --- -------- --------- ---------
+GRB050904                1   Ks  20.0    0.07   -       AB         1     isaac
+GRB050904                1    H 20.37    0.07   -       AB         1     isaac
+GRB050904                1    J  20.7    0.06   -       AB         1     isaac
+GRB050904                1    z  21.8     0.2   -       AB         1     fors2
+GRB050904                1    I 24.45     0.2   -       AB         1     fors2
+GRB050904                1    R  23.9    0.05   -       AB         0     cafos
+GRB050904                1    V  24.6    0.05   -       AB         0     laica
+
+
+Info about data:
+Name      type  RA_J2000   DEC_J2000   ... beta_inf beta_X beta_X_sup beta_X_inf
+--------- ---- ---------- ------------ ... -------- ------ ---------- ----------
+GRB050904  sed 0h54m50.6s +14d05m04.5s ...      0.3    -99        -99        -99
+
+
