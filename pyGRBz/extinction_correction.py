@@ -3,8 +3,8 @@
 import sys, os
 import numpy as np
 from astropy.table import Column
-from los_extinction.igm import meiksin, madau, dla
-from los_extinction.reddening import reddening
+from pyGRBaglow.igm import meiksin, madau, dla
+from pyGRBaglow.reddening import reddening
 from . import constants as cc
 
 def sed_extinction(wavelength, z, Av, ext_law, Host_dust=True, Host_gas=False, MW_dust=True, MW_gas=False, DLA=False, igm_att='Meiksin'):
@@ -69,7 +69,7 @@ def sed_extinction(wavelength, z, Av, ext_law, Host_dust=True, Host_gas=False, M
     return Trans_tot
 
 
-def correct_MW_ext(data,grb_info,wavelength,recalibration='no',dustmapdir=os.getenv('GFTSIM_DIR')+'/los_extinction/los_extinction/galactic_dust_maps'):
+def correct_MW_ext(data,grb_info,wavelength,recalibration='no',dustmapdir='Default'):
     """ Correct the data from extinction occuring in the line of sight in the Milky Way
     """
     #from dustmap import SFD98Map
@@ -77,8 +77,15 @@ def correct_MW_ext(data,grb_info,wavelength,recalibration='no',dustmapdir=os.get
     from astropy.coordinates import SkyCoord
     import astropy.units as u
     import extinction
+    import pkg_resources
     from scipy.interpolate import interp1d
-    
+
+    if dustmapdir == 'Default':
+        # Get the path to the directory where the dust maps are
+        dustmapdir = pkg_resources.resource_filename('pyGRBaglow',
+                                                    'galactic_dust_maps')
+  
+     
     # Add column in data for the galctic extinction in mag
     col_band_extmag=Column(name='ext_mag',data=np.zeros((len(data))))
     data.add_columns([col_band_extmag])
@@ -86,7 +93,7 @@ def correct_MW_ext(data,grb_info,wavelength,recalibration='no',dustmapdir=os.get
     for grb in grb_info.group_by(['name']).groups:
          mask=data['Name']==grb['name']
 
-         if 'MW_corrected' in grb.colnames and grb['MW_corrected']=='False':
+         if 'MW_corrected' in grb.colnames and grb['MW_corrected'][0].lower() =='no':
               #load map
               # If original value from  Schlegel, Finkbeiner & Davis (1998) use scaling=1.0
               # For using the recalibration by Schlafly & Finkbeiner (2011) use sacling = 0.86 (default)
