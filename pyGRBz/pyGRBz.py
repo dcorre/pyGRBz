@@ -72,7 +72,7 @@ class GRB_photoZ():
        #self.system_response = np.array(load_sys_response(self.data,self.wavelength))
        self.system_response = load_sys_response(self.data,self.wavelength,path=self.path)
         
-   def formatting(self,dustrecalib='yes',dustmapdir=os.getenv('los_extinction_DIR')+'/los_extinction/galactic_dust_maps'):
+   def formatting(self,dustrecalib='yes',dustmapdir='Default'):
        """ set the data in the right format """
 
        # Add the fluxes to the seds and convert vega in AB magnitudes if needed
