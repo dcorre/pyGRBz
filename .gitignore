@@ -115,3 +115,6 @@ ENV/
 
 # Exclude backup files 
 *.bk
+
+# Exclude results folder
+pyGRBz/results/
