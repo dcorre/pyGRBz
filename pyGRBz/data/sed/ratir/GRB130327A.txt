@@ -3,7 +3,7 @@
 #type:sed
 #RA_J2000:2h54m00.73s
 #DEC_J2000:+13d23m43.0s
-#MW_corr:0
+#MW_corrected: no
 #time_since_burst:4260
 #z:3.9
 #zph:<3.9

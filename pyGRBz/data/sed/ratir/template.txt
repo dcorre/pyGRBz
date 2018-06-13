@@ -3,7 +3,7 @@
 #type:sed
 #RA_J2000:
 #DEC_J2000:
-#MW_corr:0
+#MW_corrected: yes
 #time_since_burst:
 ##zspec
 #z:

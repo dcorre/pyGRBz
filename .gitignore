@@ -64,6 +64,7 @@ instance/
 
 # Sphinx documentation
 docs/_build/
+docs/api
 
 # PyBuilder
 target/
@@ -112,3 +113,5 @@ ENV/
 #Exclude zip file
 *.zip
 
+# Exclude backup files 
+*.bk

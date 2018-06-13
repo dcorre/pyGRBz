@@ -4,7 +4,7 @@
 #RA_J2000:02h37m09.77s
 #DEC_J2000:+08d04m40.49s
 ##MW_corr:1 -> already corrected / 0 not corrected
-#MW_corr:0
+#MW_corrected: no
 #time_since_burst:64800
 #z:3.5
 ##no zspec it is a zph
