@@ -43,7 +43,8 @@ def fit_lc(observations,grb_info,model,method='best'):
     """
     grb_ref=[]
     band_list=[] 
-    telescope_list=[] 
+    telescope_list=[]
+    nb_obs=[]
     F0_list=[]
     norm_list=[]
     alpha_list=[]
@@ -58,9 +59,15 @@ def fit_lc(observations,grb_info,model,method='best'):
     for obs_table in observations.group_by('Name').groups:
         mask = grb_info['name'] == obs_table['Name'][0]
 
-        # Check whether it is a light curve or a sed
-        z_sim = grb_info['z'][mask]
-        Av_sim = grb_info['Av_host'][mask]
+        # If redshift and Av are provided in the data file use them
+        try:
+            z_sim = grb_info['z'][mask]
+        except:
+            z_sim = -99
+        try:
+            Av_sim = grb_info['Av_host'][mask]
+        except:
+            Av_sim = -99
 
         # Fit light curve for each band of a given telescope
         for band_table  in obs_table.group_by(['telescope','band']).groups.keys:
@@ -72,6 +79,11 @@ def fit_lc(observations,grb_info,model,method='best'):
             #print (y)
             yerr_=obs_table[mask2]['flux_err']
             #print(yerr_)
+
+
+            
+            #detected = obs_table[mask2]['detection']
+            #print (obs_table['band'][mask2],obs_table['telescope'][mask2], detected)
 
             # -------Guess initial values-----------
             F0_guess=y[0]
@@ -119,6 +131,7 @@ def fit_lc(observations,grb_info,model,method='best'):
             grb_ref.append(grb_info['name'][mask][0])
             band_list.append(band_table['band'])
             telescope_list.append(band_table['telescope'])
+            nb_obs.append(len(y))
             F0_list.append(m.values['F0'])
             norm_list.append(m.values['norm'])
             chi2_list.append(d.fval)
@@ -132,8 +145,25 @@ def fit_lc(observations,grb_info,model,method='best'):
                 s_list.append(m.values['s'])
 
         if method == 'best':
-            # If few points take the parameters of the best fit. It assumes achromatic evolution
-            best_fitted_band = obs_table['band'][np.argmax(obs_table['eff_wvl'])]
+            min_obs = 2
+
+            for i in range(len(nb_obs)):
+                # If few points take the parameters of the fit of the band with most observations. It assumes achromatic evolution    
+                if nb_obs[i] < min_obs:
+                    
+                    # Find band with most observations
+                    idx_max_obs = np.argmax(nb_obs)
+                    best_band = band_list[np.argmax(nb_obs)]
+
+                    if model == 'SPL':
+                        alpha_list[i] = alpha_list[idx_max_obs]
+
+                    elif model == 'BPL':
+                        alpha1_list[i] = alpha1_list[idx_max_obs]
+                        alpha2_list[i] = alpha2_list[idx_max_obs]
+                        t1_list[i] = t1_list[idx_max_obs]
+                        s_list[i] = s_list[idx_max_obs]
+            
 
     #create astropy table as output
     if model == 'BPL': 
@@ -146,7 +176,6 @@ def fit_lc(observations,grb_info,model,method='best'):
         # If few points take the parameters of the best fit. It assumes achromatic evolution
         mask = lc_params['band'][np.argmax(lc_params['chi2'])]
     """
-
 
     return lc_fit_params
 
@@ -214,10 +243,11 @@ def extract_seds(observations, grb_info, plot=True, model='PL', method='ReddestB
             #print (time_sed)
 
             for tel in obs_table.group_by(['telescope','band']).groups.keys:
+                min_obs = 0
                 #print (tel)
                 # print (obs_table[obs_table['band'] == tel['band']])
                 #Do not use bands with only one point Can be used if achromatic assumption
-                if len(obs_table[obs_table['band'] == tel['band']]) <= 1: continue
+                if len(obs_table[obs_table['band'] == tel['band']]) <= min_obs: continue
 
                 mask2 = (lc_fit_params['name'] == obs_table['Name'][0]) & (lc_fit_params['band'] == tel['band']) & (lc_fit_params['telescope'] == tel['telescope'])
                 mask3 = (obs_table['band'] == tel['band']) & (obs_table['telescope'] == tel['telescope'])
@@ -230,6 +260,12 @@ def extract_seds(observations, grb_info, plot=True, model='PL', method='ReddestB
                 # Estimate the error with the closest data point
                 idx=np.argmin((time_sed-obs_table['time_since_burst'][mask3])**2)
                 fluxerr=obs_table['flux_err'][mask3][idx]
+
+                # Check whether it is a detection or upper limit at this time
+                if time_sed > obs_table['time_since_burst'][mask3][idx]:
+                    detected = obs_table['detection'][mask3][idx]
+                else:
+                    detected = obs_table['detection'][mask3][idx-1]
 
                 name_sed.append(obs_table['Name'][0])
                 band_list.append(tel['band'])
@@ -246,7 +282,8 @@ def extract_seds(observations, grb_info, plot=True, model='PL', method='ReddestB
                 zp.append(obs_table['zeropoint'][mask3][0])
                 zp2.append(obs_table['zp'][mask3][0])
                 tel_name.append(obs_table['telescope'][mask3][0])
-                detection.append(obs_table['detection'][mask3][idx])
+                #detection.append(obs_table['detection'][mask3][idx])
+                detection.append(detected)
          
         #create astropy table
         #seds_extracted = Table([name_sed,time_sed_list,band_list,wvl_eff,sed_mag,sed_magerr,sed_flux,sed_fluxerr,phot_sys,tel_name,detection,zp,band_width_list,sys_response_list,mag_ext_list],names=['Name','time_since_burst','band','eff_wvl','mag','mag_err','flux','flux_err','phot_sys','telescope','detection','zeropoint','band_width','sys_response','ext_mag']) 
@@ -469,10 +506,20 @@ def mcmc(seds, grb_info,  wavelength, plot, sampler_type='ensemble',
        #Check that there is at least a detection in one band
        if any(sed['detection']==1):
            mask = grb_info['name']==sed['Name'][0]
-           z_sim=float(np.asscalar(grb_info['z'][mask]))
-           Av_sim=float(np.asscalar(grb_info['Av_host'][mask]))
-           if 'beta' in grb_info.colnames: beta_sim=float(np.asscalar(grb_info['beta'][mask]))
-           else: beta_sim=0.
+
+           # If redshift and Av are provided in the data file use them
+           try:
+               z_sim=float(np.asscalar(grb_info['z'][mask]))
+           except:
+               z_sim = -99
+           try:
+               Av_sim=float(np.asscalar(grb_info['Av_host'][mask]))
+           except:
+               Av_sim = -99
+           try:
+               beta_sim=float(np.asscalar(grb_info['beta'][mask]))
+           except:
+               beta_sim= -99
            print ('z_lit: {0:.2f}   Av_lit: {1:.2f}'.format(z_sim,Av_sim)) 
 
            #Normalisation values chosed to be the ones of the reddest band
@@ -549,9 +596,9 @@ def mcmc(seds, grb_info,  wavelength, plot, sampler_type='ensemble',
 
            # Keep only data after discarding the "nburn" first steps
            if sampler_type == 'ensemble':
-               data2keep=samples_corr[:, nburn:, :]
+               data2keep=samples_corr
            elif sampler_type == 'pt':
-               data2keep=samples_corr[:, :, nburn:, :]
+               data2keep=samples_corr
   
            # If less than (nwalkers-5) chains remains after the "chains cleaning", do not compute statistics and ends here 
            if clean_data and (nwalkers - len(index_removed)) < 5:
@@ -566,7 +613,7 @@ def mcmc(seds, grb_info,  wavelength, plot, sampler_type='ensemble',
 
                # Create evolution plot
                if sampler_type == 'ensemble':
-                   plot_mcmc_evolution(samples_corr, samples_del, nburn, ndim, ext_law, Av_sim, z_sim, sed['Name'][0], plot, plot_deleted, output_dir=output_dir, filename_suffix=filename_suffix, priors=priors)
+                   plot_mcmc_evolution(sampler.chain, samples_del, nburn, ndim, ext_law, Av_sim, z_sim, sed['Name'][0], plot, plot_deleted, output_dir=output_dir, filename_suffix=filename_suffix, priors=priors)
                elif sampler_type == 'pt':
                    # Not implemented yet
                    pass 
@@ -733,6 +780,7 @@ def return_bestlnproba(lnproba,chain,ndim):
    #print (lnproba)
    #print (idx, lnproba.shape)
    chi2=-2*lnproba[idx]
+
    #print ('\nbest fit:')
    if ndim==3:
        print ('z: {:.3f}  beta: {:.3f}  Norm: {:.3f}     chi2: {:.3f}'.format(chain[idx][0],chain[idx][1],chain[idx][2],chi2))

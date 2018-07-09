@@ -246,7 +246,7 @@ def load_info_observations(filenames):
          data_list.append(data)
          #if counter==0: data_info = data
          #else: data_info = vstack([data_info,data],join_type='outer')
-    data_info=vstack(data_list)
+    data_info=vstack(data_list,join_type='outer')
     #sort by name
     data_info.sort('name')
     

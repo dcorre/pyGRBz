@@ -38,12 +38,13 @@ def load_sys_response(data,wavelength,path='/home/dcorre/code/python_etc/grb_pho
               a=np.trapz(wavelength*filter_trans, wavelength)
               b=np.trapz(filter_trans, wavelength)
               wvl_eff.append(a/b)
-              #print (a/b)
-
+              
               #Calculate the width of the band
               mask = filter_trans > 0.05*max(filter_trans)
+
               width.append(wavelength[mask][-1] -  wavelength[mask][0])
 
+              #print (tel['telescope'], tel['band'], a/b, width[-1])
               #Not sure it is used anymore ... to be checked. Formula also to check
               zp.append(2.5*np.log10(np.sum(filter_trans*dwvl,axis=0)) + 23.9)
 

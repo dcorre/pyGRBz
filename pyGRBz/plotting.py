@@ -14,8 +14,16 @@ def plot_lc_fit_check(observations, grb_info, lc_fit_params, model, plot,output_
     # Go through each grb observations
     for obs_table in observations.group_by('Name').groups:
          #print (obs_table)
-         z_sim = grb_info['z'][obs_table['Name'][0]==grb_info['name']]
-         Av_sim = grb_info['Av_host'][obs_table['Name'][0]==grb_info['name']]
+
+         # If redshift and Av are provided in the data file use them
+         try:
+             z_sim = grb_info['z'][obs_table['Name'][0]==grb_info['name']][0]
+         except:
+             z_sim = -99
+         try:
+             Av_sim = grb_info['Av_host'][obs_table['Name'][0]==grb_info['name']][0]
+         except:
+             Av_sim = -99
 
          # Set color for plots
          cmap = plt.get_cmap('rainbow')
@@ -52,7 +60,7 @@ def plot_lc_fit_check(observations, grb_info, lc_fit_params, model, plot,output_
          #plt.ylim(0,230)
          #plt.xscale('log')
          #print (time[0],z_sim,Av_sim)
-         plt.title('Light curve from T-To=%.0f to T-To=%.0f sec \n z=%.2f, Av_host=%.2f \n %s' % (np.min(obs_table['time_since_burst']),np.max(obs_table['time_since_burst']),float(z_sim[0]),float(Av_sim[0]),obs_table['Name'][0]))
+         plt.title('Light curve from T-To=%.0f to T-To=%.0f sec \n z=%.2f, Av_host=%.2f \n %s' % (np.min(obs_table['time_since_burst']),np.max(obs_table['time_since_burst']),float(z_sim),float(Av_sim),obs_table['Name'][0]))
          plt.xlabel(r'T-T$_{0}$ [seconds]')
          plt.ylabel(r'Flux [$\mu$Jy]')
          #plt.axvline(305,color='red',lw=3)
@@ -72,8 +80,17 @@ def plot_sed(seds, grb_info, plot, model, output_dir='results/', filename_suffix
     """
     plt.figure()
     for sed in seds.group_by('Name').groups:
-         z=float(grb_info['z'][grb_info['name']==sed['Name'][0]][0])
-         Av_host=float(grb_info['Av_host'][grb_info['name']==sed['Name'][0]][0])
+         # If redshift and Av are provided in the data file use them
+         try:
+             z=float(grb_info['z'][grb_info['name']==sed['Name'][0]][0])
+         except:
+             z = -99
+         try:
+             Av_host=float(grb_info['Av_host'][grb_info['name']==sed['Name'][0]][0])
+         except:
+             Av_host = -99
+
+    
 
          # Set color for plots
          cmap = plt.get_cmap('rainbow')

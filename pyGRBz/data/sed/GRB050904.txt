@@ -1,10 +1,11 @@
-##Taken from http://arxiv.org/pdf/astro-ph/0509766v2.pdf
+##Taken from http://arxiv.org/pdf/astro-ph/0509766v2.pdf figure 3
 #name:GRB050904
 #type:sed
 #RA_J2000:0h54m50.6s
 #DEC_J2000:+14d05m04.5s
-#MW_corrected: no
-#time_since_burst: 1
+#MW_corrected: yes
+#time_since_burst: 1.155
+#time_unit: d
 #z:6.29
 #zph:6.3
 #zph_sup:0.1
@@ -20,10 +21,11 @@
 #beta_X_sup:-99
 #beta_X_inf:-99
 band mag mag_err zp phot_sys detection telescope
-Ks 20 0.07 - AB 1 isaac
-H 20.37 0.07 - AB 1 isaac
-J 20.7 0.06 - AB 1 isaac
-z 21.80 0.2 - AB 1 fors2
-I 24.45 0.2 - AB 1 fors2
-R 23.9 0.05 - AB 0 cafos
-V 24.6 0.05 - AB 0 laica
+Ks 19.26 0.07 - AB 1 isaac
+H 19.74 0.07 - AB 1 isaac
+J 20.14 0.06 - AB 1 isaac
+z 21.03 0.22 - AB 1 fors2
+I 22.27 0.22 - AB 1 cafos
+I 24.20 0.2 - AB 1 fors2
+R 24.29 0.05 - AB 0 cafos
+V 24.23 0.05 - AB 0 laica

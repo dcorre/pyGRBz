@@ -13,8 +13,8 @@ with open('README.rst') as readme_file:
 with open('HISTORY.rst') as history_file:
     history = history_file.read()
 
-requirements = ['Click>=6.0', 'NumPy', 'scipy', 'matplotlib', 'jupyter',
-                'astropy', 'iminuit', 'emcee', 'corner', 'sfdmap', 'extinction']
+requirements = ['Click>=6.0', 'numpy', 'scipy', 'matplotlib', 'jupyter',
+                'astropy', 'iminuit', 'emcee<3.0', 'corner', 'sfdmap', 'extinction']
 
 setup_requirements = ['pytest-runner', ]
 
