@@ -5,9 +5,9 @@ from collections import OrderedDict
 from astropy.table import Table
 from astropy.io import ascii
 import corner
-from .models import Flux_template, SPL_lc, BPL_lc
+from pyGRBz.models import Flux_template, SPL_lc, BPL_lc
 
-def plot_lc_fit_check(observations, grb_info, lc_fit_params, model, plot,output_dir='results/', filename_suffix=''):
+def plot_lc_fit_check(observations, grb_info, lc_fit_params, model, plot,output_dir='/results/', filename_suffix=''):
     """ Plot the fitting light curves 
     """
     
@@ -74,7 +74,7 @@ def plot_lc_fit_check(observations, grb_info, lc_fit_params, model, plot,output_
          plt.close('all')
 
 
-def plot_sed(seds, grb_info, plot, model, output_dir='results/', filename_suffix=''):
+def plot_sed(seds, grb_info, plot, model, output_dir='/results/', filename_suffix=''):
     """ Plot the extracted SED
 
     """
@@ -114,7 +114,7 @@ def plot_sed(seds, grb_info, plot, model, output_dir='results/', filename_suffix
          plt.close('all')
 
 
-def plot_mcmc_evolution(samples_corr, samples_del, nburn, ndim, ext_law, Av_sim, z_sim, name, plot, plot_deleted, output_dir='test/', filename_suffix='', priors=dict(z=[0,11], Av=[0,2], beta=[0,2], norm=[0,10])):
+def plot_mcmc_evolution(samples_corr, samples_del, nburn, ndim, ext_law, Av_sim, z_sim, name, plot, plot_deleted, output_dir='/test/', filename_suffix='', priors=dict(z=[0,11], Av=[0,2], beta=[0,2], norm=[0,10])):
    """ Plot the chains evolution
    """
    i=0
@@ -161,7 +161,7 @@ def plot_mcmc_evolution(samples_corr, samples_del, nburn, ndim, ext_law, Av_sim,
    plt.close('all')
 
 
-def plot_triangle(samples, ndim, z_sim, ext_law, Av_sim, beta_sim, name, plot, plot_deleted, filename_suffix='', output_dir='test/', priors=dict(z=[0,11],Av=[0,2],beta=[0,2],norm=[0,10])):
+def plot_triangle(samples, ndim, z_sim, ext_law, Av_sim, beta_sim, name, plot, plot_deleted, filename_suffix='', output_dir='/test/', priors=dict(z=[0,11],Av=[0,2],beta=[0,2],norm=[0,10])):
    """ Plot the triangle """
    if ndim ==3:
        fig = corner.corner(samples, labels=["z", "beta", "norm"],
@@ -199,7 +199,7 @@ def plot_triangle(samples, ndim, z_sim, ext_law, Av_sim, beta_sim, name, plot, p
 
 
 
-def plot_mcmc_fit(results, ndim, results_minL, sed, wavelength, samples, plot_all, plot, ext_law, Host_dust, Host_gas, MW_dust, MW_gas, DLA, igm_att, output_dir='test/', filename_suffix=''):
+def plot_mcmc_fit(results, ndim, results_minL, sed, wavelength, samples, plot_all, plot, ext_law, Host_dust, Host_gas, MW_dust, MW_gas, DLA, igm_att, output_dir='/test/', filename_suffix=''):
    """ Plot the flux template corresponding to the best fit of the mcmc
    """
    z_sim=results['z_sim'][0]
@@ -269,7 +269,7 @@ def plot_mcmc_fit(results, ndim, results_minL, sed, wavelength, samples, plot_al
    if plot: plt.show()
    plt.close('all')
 
-def plot_zphot(input_file,output_suffix,sigma,input_dir='results/',output_dir='plots/',plot=True):
+def plot_zphot(input_file,output_suffix,sigma,input_dir='/results/',output_dir='/plots/',plot=True):
    """ Plots zphot vs zsim. No inputs required, the plot is saved in plots/ (default)
 
    Parameters
@@ -385,7 +385,7 @@ def plot_zphot(input_file,output_suffix,sigma,input_dir='results/',output_dir='p
    #print (Avsim)
    x=np.arange(0,12,1)
    for i,nb_det in enumerate(nb_detections):
-       plt.scatter(zsim[i],zphot[i],c=Avsim[i],cmap=plt.cm.jet,marker=markers[int(nb_det-1)],vmin=min(Avsim),vmax=max(Avsim),s=50)#,alpha=1,lw=2.5,facecolor=1)#,facecolor='0.7', lw = 0.8)
+       plt.scatter([zsim[i]],[zphot[i]],c=[Avsim[i]],cmap=plt.cm.jet,marker=markers[int(nb_det-1)],vmin=min(Avsim),vmax=max(Avsim),s=50)#,alpha=1,lw=2.5,facecolor=1)#,facecolor='0.7', lw = 0.8)
    plt.fill_between(list(zsim), list(z_inf), list(z_sup),color='blue',alpha=0.3)#,label=r'$z_{sup}$ - $z_{inf}$ at 1$\sigma$')
    plt.plot(x,x,ls='--',color='red',lw=0.5)
    #plt.legend(loc='upper left')
@@ -419,7 +419,7 @@ def plot_zphot(input_file,output_suffix,sigma,input_dir='results/',output_dir='p
 
    x=np.arange(0,12,1)
    for i,nb_det in enumerate(nb_detections):
-       plt.scatter(zsim[i],zphot[i]-zsim[i],c=Avsim[i],cmap=plt.cm.jet,vmin=min(Avsim),vmax=max(Avsim),marker=markers[int(nb_det-1)],s=50)#,facecolor='0.7', lw = 0.8)
+       plt.scatter([zsim[i]],[zphot[i]-zsim[i]],c=[Avsim[i]],cmap=plt.cm.jet,vmin=min(Avsim),vmax=max(Avsim),marker=markers[int(nb_det-1)],s=50)#,facecolor='0.7', lw = 0.8)
    #plt.fill_between(zsim_bin, bin_inf_means-zsim_bin, bin_sup_means-zsim_bin,color='blue',alpha=0.3,label=r'$z_{sup}$ - $z_{inf}$ at 1$\sigma$')
    plt.fill_between(list(zsim), list(np.array(z_inf)-np.array(zsim)),list(np.array(z_sup)-np.array(zsim)),color='blue',alpha=0.3)#,label=r'$z_{sup}$ - $z_{inf}$ at 1$\sigma$')
    #plt.plot(x,0,ls='--',color='red',lw=0.5)
@@ -449,7 +449,7 @@ def plot_zphot(input_file,output_suffix,sigma,input_dir='results/',output_dir='p
 
    x=np.arange(0,12,1)
    for i,nb_det in enumerate(nb_detections):
-       plt.scatter(zsim[i],(zphot[i]-zsim[i])/(1+zsim[i]),c=Avsim[i],cmap=plt.cm.jet,vmin=min(Avsim),vmax=max(Avsim),marker=markers[int(nb_det-1)],s=50)#,facecolor='0.7', lw = 0.8)
+       plt.scatter([zsim[i]],[(zphot[i]-zsim[i])/(1+zsim[i])],c=[Avsim[i]],cmap=plt.cm.jet,vmin=min(Avsim),vmax=max(Avsim),marker=markers[int(nb_det-1)],s=50)#,facecolor='0.7', lw = 0.8)
    plt.fill_between(list(zsim), list((np.array(z_inf)-np.array(zsim))/(1+np.array(zsim))),list((np.array(z_sup)-np.array(zsim))/(1+np.array(zsim))),color='blue',alpha=0.3)#,label=r'$z_{sup}$ - $z_{inf}$ at 1$\sigma$')
    #plt.plot(x,0,ls='--',color='red',lw=0.5)
    #plt.legend(loc='upper left')
