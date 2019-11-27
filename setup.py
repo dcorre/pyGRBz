@@ -13,8 +13,18 @@ with open('README.rst') as readme_file:
 with open('HISTORY.rst') as history_file:
     history = history_file.read()
 
-requirements = ['Click>=6.0', 'numpy', 'scipy', 'matplotlib', 'jupyter',
-                'astropy', 'iminuit', 'emcee<3.0', 'corner', 'sfdmap', 'extinction']
+requirements = [
+        'Click>=6.0',
+        'numpy',
+        'scipy',
+        'matplotlib',
+        'jupyter',
+        'astropy',
+        'iminuit',
+        'emcee<3.0',
+        'corner',
+        'sfdmap',
+        'extinction']
 
 setup_requirements = ['pytest-runner', ]
 
@@ -47,7 +57,7 @@ setup(
     include_package_data=True,
     keywords='pyGRBz',
     name='pyGRBz',
-    packages=find_packages(include=['pyGRBz']),
+    packages=find_packages(),
     setup_requires=setup_requirements,
     test_suite='tests',
     tests_require=test_requirements,
