@@ -10,9 +10,9 @@ from iminuit.util import make_func_code
 import emcee
 from astropy.table import Table, vstack
 from astropy.io import ascii
-from .utils import mag2Jy,Jy2Mag
-from .models import Flux_template, BPL_lc, SPL_lc
-from .plotting import plot_lc_fit_check, plot_sed, plot_mcmc_evolution, plot_triangle, plot_mcmc_fit
+from pyGRBz.utils import mag2Jy,Jy2Mag
+from pyGRBz.models import Flux_template, BPL_lc, SPL_lc
+from pyGRBz.plotting import plot_lc_fit_check, plot_sed, plot_mcmc_evolution, plot_triangle, plot_mcmc_fit
 
 
 class Chi2Functor_lc:

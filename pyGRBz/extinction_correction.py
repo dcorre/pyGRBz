@@ -5,7 +5,7 @@ import numpy as np
 from astropy.table import Column
 from pyGRBaglow.igm import meiksin, madau, dla
 from pyGRBaglow.reddening import reddening
-from . import constants as cc
+from pyGRBz import constants as cc
 
 def sed_extinction(wavelength, z, Av, ext_law, Host_dust=True, Host_gas=False, MW_dust=True, MW_gas=False, DLA=False, igm_att='Meiksin'):
     """ Computes the extinction to apply on a sed at a given redshift 

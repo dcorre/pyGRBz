@@ -4,11 +4,11 @@ import numpy as np
 from astropy.io import ascii
 import os
 
-from .formatting import load_sys_response, formatting_data
-from .io_grb import load_observations, load_info_observations
-from .fitting import extract_seds, mcmc
-from .plotting import plot_zphot
-
+from pyGRBz.formatting import load_sys_response, formatting_data
+from pyGRBz.io_grb import load_observations, load_info_observations
+from pyGRBz.fitting import extract_seds, mcmc
+from pyGRBz.plotting import plot_zphot
+import imp
 import warnings
 warnings.filterwarnings("ignore")
 
@@ -23,20 +23,26 @@ class GRB_photoZ():
 
    """
 
-   def __init__(self,path=os.getenv('pyGRBz_DIR')+'/pyGRBz/', wvl_step=100, wvl_min=2500, wvl_max=25000, plot=True, output_dir='results/'):
+   def __init__(self, wvl_step=100, wvl_min=2500, wvl_max=25000, plot=True, output_dir='/results/'):
         """
         Class Constructor.
 
         """
+
+        try:
+           _, path, _ = imp.find_module('pyGRBz')
+        except:
+           print ('path to pyETC can not be found.')
+
         self.wvl_step=wvl_step
         self.wvl_min=wvl_min
         self.wvl_max=wvl_max
         self.plot = plot
         self.path=path
-        self.output_dir=output_dir
-        if not os.path.exists(output_dir): os.makedirs(output_dir)
+        self.output_dir=self.path + output_dir
+        if not os.path.exists(self.output_dir): os.makedirs(self.output_dir)
 
-   def load_data(self,data_dir='data/sed/',data_name='GRB130606A'):
+   def load_data(self,data_dir='/data/sed/',data_name='GRB130606A'):
        """ Load observations, either a light curve or sed
 
        Returns
@@ -72,14 +78,14 @@ class GRB_photoZ():
        #self.system_response = np.array(load_sys_response(self.data,self.wavelength))
        self.system_response = load_sys_response(self.data,self.wavelength,path=self.path)
         
-   def formatting(self,dustrecalib='yes',dustmapdir='Default'):
+   def formatting(self,dustrecalib='yes'):
        """ set the data in the right format """
 
        # Add the fluxes to the seds and convert vega in AB magnitudes if needed
-       self.data=formatting_data(self.data,self.system_response,self.grb_info,self.wavelength,dustrecalib=dustrecalib,dustmapdir=dustmapdir)
+       self.data=formatting_data(self.data,self.system_response,self.grb_info,self.wavelength,dustrecalib=dustrecalib)
        print('\nSEDS formatted:\n {}\n'.format(self.data))
 
-   def extract_sed(self,model='SPL',method='ReddestBand',time_SED=1,output_dir='results/',filename_suffix=''):
+   def extract_sed(self,model='SPL',method='ReddestBand',time_SED=1,output_dir='/results/',filename_suffix=''):
        """ Extract the SED from LC if needed"""
 
        self.seds = extract_seds(self.data,self.grb_info,plot=self.plot,model=model,method=method,time_SED=time_SED,output_dir=self.output_dir,filename_suffix=filename_suffix)
@@ -94,7 +100,7 @@ class GRB_photoZ():
        print (results)
        #latex_result_table=latex_format_results(results)
 
-   def plot_zsim_zphot(self,input_file='best_fits_mcmc',output_suffix='testagain',sigma=2,input_dir='results/',output_dir='plots/',plot=True):
+   def plot_zsim_zphot(self,input_file='best_fits_mcmc',output_suffix='testagain',sigma=2,input_dir='/results/',output_dir='/plots/',plot=True):
 
        plot_zphot(input_file,output_suffix,sigma,input_dir=self.path+input_dir,output_dir=self.path+output_dir,plot=True) 
 

@@ -276,7 +276,7 @@ def load_telescope_transmissions(info_dict,wavelength,norm=False,norm_val=1.):
     from .utils import resample
     from . import constants as cc
 
-    filter_path=info_dict['path']+'transmissions/'+info_dict['telescope']+'/'+info_dict['band']+'.txt'
+    filter_path=info_dict['path']+'/transmissions/'+info_dict['telescope']+'/'+info_dict['band']+'.txt'
     File=open(filter_path, "r")
     lines=File.readlines()
 

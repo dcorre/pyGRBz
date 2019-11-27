@@ -1,13 +1,14 @@
 # -*- coding: utf-8 -*-
 import numpy as np
 import os
-from .utils import mag2Jy,convAB
+from pyGRBz.utils import mag2Jy,convAB
 from astropy.table import Table,Column
 from astropy.io import ascii
-from .extinction_correction import correct_MW_ext
-from .io_grb import load_telescope_transmissions
+from pyGRBz.extinction_correction import correct_MW_ext
+from pyGRBz.io_grb import load_telescope_transmissions
+import imp
 
-def load_sys_response(data,wavelength,path='/home/dcorre/code/python_etc/grb_photoz/grb_photoz/'):
+def load_sys_response(data,wavelength,path):
     """ Load the system throuput curves for each filter in the data
 
     Returns 
@@ -55,8 +56,15 @@ def load_sys_response(data,wavelength,path='/home/dcorre/code/python_etc/grb_pho
     return sys_res_table 
 
 
-def formatting_data(data,system_response,grb_info,wavelength,dustrecalib='yes',dustmapdir=os.getenv('GFTSIM_DIR')+'/los_extinction/los_extinction/galactic_dust_maps'):
+def formatting_data(data,system_response,grb_info,wavelength,dustrecalib='yes'):
     """ """
+    try:
+        _, path_dust_map, _ = imp.find_module('pyGRBaglow')
+    except:
+        print ('path to pyETC can not be found.')
+
+    dustmapdir = path_dust_map + '/galactic_dust_maps'
+
     # Add filter info to data (throughut curve,eff. wvl and width)
     col_band_width=Column(name='band_width',data=np.zeros(len(data)))
     col_band_effwvl=Column(name='eff_wvl',data=np.zeros(len(data)))

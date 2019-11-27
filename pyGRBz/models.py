@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-from .extinction_correction import sed_extinction
+from pyGRBz.extinction_correction import sed_extinction
 
 
 

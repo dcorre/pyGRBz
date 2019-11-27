@@ -2,8 +2,8 @@
 
 import numpy as np
 from scipy.interpolate import interp1d
-from . import constants as cc
-
+from pyGRBz import constants as cc
+import imp
 
 #-------------------------------------------------------------------------------------------
 def resample(x,y,x_new,y_min=None,y_max=None):
@@ -520,7 +520,10 @@ def sed_vega():
           Flux of Vega in erg/cm2/s/A
 
     """
-    VEGA_PATH='/home/dcorre/code/python_etc/grb_photoz/grb_photoz/data/bohlin2006_Vega.dat'#astLib.__path__[0]+os.path.sep+"data"+os.path.sep+"bohlin2006_Vega.sed" # from HST CALSPEC
+    # If code arrived here, it means that the pyGRBz package
+    # has already been installed so no need to use try except to check
+    _, path, _ = imp.find_module('pyGRBz')
+    VEGA_PATH=path+'/data/bohlin2006_Vega.dat' # from HST CALSPEC
 
 
     inFile=open(VEGA_PATH, "r")
