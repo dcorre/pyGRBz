@@ -17,13 +17,13 @@ Instantiate the class
  
 .. code:: python
 
-    photoz = GRB_photoZ(output_dir=os.getenv('pyGRBz_DIR')+'/pyGRBz/results/Tuto/SED/')
+    photoz = GRB_photoZ(output_dir='/results/Tuto/SED/')
 
 Load the SED of GRB050904 stored in data/sed/
 
 .. code:: python
 
-    >>> photoz.load_data(data_dir='data/sed/',data_name=['GRB050904'])
+    >>> photoz.load_data(data_dir='/data/sed/',data_name=['GRB050904'])
     
     
     Observations:
