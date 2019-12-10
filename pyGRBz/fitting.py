@@ -37,7 +37,7 @@ class Chi2Functor_lc:
 
 
 
-def fit_lc(observations,grb_info,model,method='best'):
+def fit_lc(observations,grb_info,model,method='best',print_level=0):
     """ Fit the lightcurve in order to get a flux and its uncertainty at each time
         The fit is performed for each band separetely
     """
@@ -109,11 +109,11 @@ def fit_lc(observations,grb_info,model,method='best'):
 
             if model == 'BPL':
                 chi2_func = Chi2Functor_lc(BPL_lc,time,y,yerr_)
-                kwdarg = dict(pedantic=True,print_level=2,F0=F0_guess,fix_F0=True,norm=norm_guess,fix_norm=False,limit_norm=(0.1,10),alpha1=-0.5,limit_alpha1=[-3,0],alpha2=0.5,limit_alpha2=[0,3],t1=t1_guess,fix_t1=False,limit_t1=[0,None],s=1,limit_s=[0.01,20])
+                kwdarg = dict(pedantic=True,print_level=print_level,F0=F0_guess,fix_F0=True,norm=norm_guess,fix_norm=False,limit_norm=(0.1,10),alpha1=-0.5,limit_alpha1=[-3,0],alpha2=0.5,limit_alpha2=[0,3],t1=t1_guess,fix_t1=False,limit_t1=[0,None],s=1,limit_s=[0.01,20])
 
             elif model == 'SPL':
                 chi2_func = Chi2Functor_lc(SPL_lc,time,y,yerr_)
-                kwdarg = dict(pedantic=True,print_level=2,F0=F0_guess,fix_F0=True,norm=norm_guess,fix_norm=False,limit_norm=(0.1,10),alpha=1,limit_alpha=[-10,10],t0=t1_guess,fix_t0=True,limit_t0=[0,None])
+                kwdarg = dict(pedantic=True,print_level=print_level,F0=F0_guess,fix_F0=True,norm=norm_guess,fix_norm=False,limit_norm=(0.1,10),alpha=1,limit_alpha=[-10,10],t0=t1_guess,fix_t0=True,limit_t0=[0,None])
             #print (describe(chi2_func))
             else:
                 sys.exit('Error: "%s" model for fitting the light curve unknown.\It should be either "BPL" or "SPL"' % model)
@@ -124,8 +124,9 @@ def fit_lc(observations,grb_info,model,method='best'):
             #m.migrad(nsplit=1,precision=1e-10)
             d,l=m.migrad()
             #print (band)
-            print ('Valid Minimum: %s ' % str(m.migrad_ok()))
-            print ('Is the covariance matrix accurate: %s' % str(m.matrix_accurate()))
+            if print_level > 0:
+                print ('Valid Minimum: %s ' % str(m.migrad_ok()))
+                print ('Is the covariance matrix accurate: %s' % str(m.matrix_accurate()))
 
 
             grb_ref.append(grb_info['name'][mask][0])
@@ -243,7 +244,7 @@ def extract_seds(observations, grb_info, plot=True, model='PL', method='ReddestB
             #print (time_sed)
 
             for tel in obs_table.group_by(['telescope','band']).groups.keys:
-                min_obs = 0
+                min_obs = 1
                 #print (tel)
                 # print (obs_table[obs_table['band'] == tel['band']])
                 #Do not use bands with only one point Can be used if achromatic assumption
