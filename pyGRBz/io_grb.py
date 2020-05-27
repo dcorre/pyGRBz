@@ -14,7 +14,7 @@ from collections import OrderedDict as odict
 import numpy as np
 from astropy.table import Table,Column,vstack
 from astropy import wcs
-from astropy.extern import six
+import six
 import gc
 
 __all__ = ['read_lc', 'load_observations', 'load_info_observations',
