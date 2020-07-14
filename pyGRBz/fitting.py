@@ -484,10 +484,10 @@ def mcmc(seds, grb_info,  wavelength, plot, sampler_type='ensemble',
    mask_det = seds['detection'] == 1
    if adapt_z and mask_det.any():
        # Sed is already sorted by ascending effective wavelength
-       wvl_cuton = float(seds['eff_wvl'][mask_det][0]) - float(seds['band_width'][mask_det][0]) / 2
-       priors['z'][1] = 1.2 * ((wvl_cuton/912) - 1)
+       wvl_cutoff = float(seds['eff_wvl'][mask_det][0]) + float(seds['band_width'][mask_det][0]) / 2
+       priors['z'][1] = (wvl_cutoff/912) - 1
        print ('Bluest band detection: %s/%s with eff_wvl=%.0f and bandwidth=%.0f (Angstroms).\n' % (seds['telescope'][mask_det][0], seds['band'][mask_det][0], seds['eff_wvl'][mask_det][0], seds['band_width'][mask_det][0]))
-       print ('Assuming no flux can be observed below Lyman break at 912 Angstroms\n--> maximum allowed redshift is %.2f (Taking 20%s uncertainty).\n' % (priors['z'][1],'%'))
+       print ('Assuming no flux can be observed below Lyman break at 912 Angstroms\n--> maximum allowed redshift is %.2f.\n' % (priors['z'][1]))
        print ('This value is used to constrain the redshift parameter space in the analysis below.')
    
 
