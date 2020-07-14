@@ -94,9 +94,9 @@ class GRB_photoZ():
     
        #ascii.write(seds['time_since_burst','band','mag','mag_err','phot_sys','detection','telescope'], str(grbname)+'_sedtable.tex',format='latex')
 
-   def fit(self,sampler_type='ensemble',ext_law='smc',Nthreads=1,nTemps=20,nwalkers=30,Nsteps1=300,Nsteps2=1000,nburn=300,Host_dust=True,Host_gas=False,MW_dust=False,MW_gas=False,DLA=False,igm_att='Meiksin',clean_data=False,plot_all=False,plot_deleted=False,priors=dict(z=[0,11],Av=[0,2],beta=[0,2],norm=[0,10]),filename_suffix='',std_gaussianBall=1e-2):
+   def fit(self,sampler_type='ensemble',ext_law='smc',Nthreads=1,nTemps=20,nwalkers=30,Nsteps1=300,Nsteps2=1000,nburn=300,Host_dust=True,Host_gas=False,MW_dust=False,MW_gas=False,DLA=False,igm_att='Meiksin',clean_data=False,plot_all=False,plot_deleted=False,priors=dict(z=[0,11],Av=[0,2],beta=[0,2],norm=[0,10]),filename_suffix='',std_gaussianBall=1e-2, adapt_z=True):
        """ Run the MCMC code """
-       results=mcmc(self.seds,self.grb_info,self.wavelength,self.plot,sampler_type=sampler_type,Nthreads=Nthreads,ext_law=ext_law,nTemps=nTemps,nwalkers=nwalkers,Nsteps1=Nsteps1,Nsteps2=Nsteps2,nburn=nburn,std_gaussianBall=std_gaussianBall,Host_dust=Host_dust,Host_gas=Host_gas,MW_dust=MW_dust,MW_gas=MW_gas,DLA=DLA,igm_att=igm_att,clean_data=clean_data,plot_all=plot_all,plot_deleted=plot_deleted,priors=priors,output_dir=self.output_dir,filename_suffix=filename_suffix)
+       results=mcmc(self.seds,self.grb_info,self.wavelength,self.plot,sampler_type=sampler_type,Nthreads=Nthreads,ext_law=ext_law,nTemps=nTemps,nwalkers=nwalkers,Nsteps1=Nsteps1,Nsteps2=Nsteps2,nburn=nburn,std_gaussianBall=std_gaussianBall,Host_dust=Host_dust,Host_gas=Host_gas,MW_dust=MW_dust,MW_gas=MW_gas,DLA=DLA,igm_att=igm_att,clean_data=clean_data,plot_all=plot_all,plot_deleted=plot_deleted,priors=priors,output_dir=self.output_dir,filename_suffix=filename_suffix, adapt_z=adapt_z)
        print (results)
        #latex_result_table=latex_format_results(results)
 
