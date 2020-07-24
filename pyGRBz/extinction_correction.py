@@ -23,6 +23,9 @@ def sed_extinction(wavelength, z, Av, ext_law, Host_dust=True, Host_gas=False, M
                total transmission on the line of sight
     """
 
+    # Make sure wavelength is an array
+    wavelength = np.atleast_1d(wavelength)
+
     # Optical extinction coefficient for local galaxy
     Av_local = 0.1   # Standard (equivalent to Rv=3.1) info_dict['Av_local']
 
