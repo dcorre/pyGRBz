@@ -9,7 +9,6 @@ User Documentation
 .. toctree::
    :maxdepth: 2
 
-   readme
    installation
    usage <usage.rst>
    contributing
