@@ -20,12 +20,13 @@ Development status
 Features
 --------
 * pyGRBz is a bayesian photometric redshift code dedicated to Gamma-Ray Bursts developed in Python3.
-* It uses either the Ensemblesampler or PTsampler from the [emcee]() package.
+* It uses either the Ensemblesampler or PTsampler from the [emcee](https://github.com/dfm/emcee) package.
 * The photometric redshift is assessed using spectral signature imprinted on the GRB afterglow Spectral Energy Distribution (SED): Lyman series absorption features, Lyman break and/or the presence of the 2175 Angstroms bump in the extinction law used to model the amount of extinction in the host galaxy.
 * The input can be either a GRB afterglow SED or multi-wavelength light curve.
-* In case, a light curve is provided, each band is fitted independtly with a template model (either a power law or a broken power law). The fit is performed using the [iminuit] package.
+* In case, a light curve is provided, each band is fitted independtly with a template model (either a power law or a broken power law). The fit is performed using the [iminuit](https://pypi.org/project/iminuit/) package.
 * 3 physical parameters are assessed: the redhsift, the amount of dust extinction in the V band, the spectral slope. 
 * 4 extinction laws can be used to model extinction in the host galaxy: MW, SMC, LMC from [Pei+92](http://adsabs.harvard.edu/abs/1992ApJ...395..130P) and no dust.
+* IGM absoprtion is modelled either with recipes from [MAdau+95](http://adsabs.harvard.edu/abs/1995ApJ...441...18M) or [Meiksin+06](http://adsabs.harvard.edu/abs/2006MNRAS.365..807M).
 * When the input is a light curve, the temporal slope for each band is also fitted.
 * Have a look to the notebook(s) to see how it works.
 
