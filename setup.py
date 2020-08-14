@@ -19,7 +19,7 @@ requirements = [
         'jupyter',
         'astropy',
         'iminuit',
-        #'emcee<3.0',
+        # 'emcee<3.0',
         'emcee',
         'corner',
         'sfdmap',
@@ -45,7 +45,8 @@ setup(
         'Programming Language :: Python :: 3.7',
         'Programming Language :: Python :: 3.8',
     ],
-    description="Python Bayesian photometric redshift code dedicated to Gamma-Ray Bursts",
+    description="Python Bayesian photometric redshift code dedicated"
+                "to Gamma-Ray Bursts",
     entry_points={
         'console_scripts': [
             'pyGRBz=pyGRBz.cli:main',
@@ -56,7 +57,7 @@ setup(
     long_description=readme,
     include_package_data=False,
     keywords=['pyGRBz', 'Gamma-Ray Burst', 'redshift photometric',
-              'Bayesian', 'MCMC']
+              'Bayesian', 'MCMC'],
     name='pyGRBz',
     packages=find_packages(),
     setup_requires=setup_requirements,
