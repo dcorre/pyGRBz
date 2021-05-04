@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
+import os
 import numpy as np
 import matplotlib.pyplot as plt
 from collections import OrderedDict
@@ -125,6 +126,7 @@ def plot_lc_fit_check(observations, grb_info, lc_fit_params,
         by_label = OrderedDict(zip(labels, handles))
         plt.legend(by_label.values(), by_label.keys(), numpoints=1, loc="best")
         plt.grid(True)
+        os.makedirs(os.path.join(output_dir, str(obs_table["Name"][0])), exist_ok=True)
         plt.savefig(
             output_dir
             + str(obs_table["Name"][0])
