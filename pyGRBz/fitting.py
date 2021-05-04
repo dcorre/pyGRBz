@@ -1319,7 +1319,9 @@ def clean_chains(sampler, nburn, acceptance_frac_lim=0.15):
                 )
         else:
             # Searching for non finite probability after the burn-in phase
-            mask = np.isfinite(lnproba[walker][nburn:]) is False
+            #mask = np.isfinite(lnproba[walker][nburn:]) is False
+            mask = np.isfinite(lnproba[walker][nburn:])
+            mask = ~mask
             if mask.any():
                 index2remove.append(walker)
                 if print_corr:
