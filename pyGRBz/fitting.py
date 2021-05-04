@@ -101,39 +101,21 @@ def fit_lc(observations, grb_info, model, method="best", print_level=0):
             if model == "BPL":
                 chi2_func = Chi2Functor_lc(BPL_lc, time, y, yerr_)
                 kwdarg = dict(
-                    pedantic=True,
-                    print_level=print_level,
                     F0=F0_guess,
-                    fix_F0=True,
                     norm=norm_guess,
-                    fix_norm=False,
-                    limit_norm=(0.1, 10),
                     alpha1=-0.5,
-                    limit_alpha1=[-3, 0],
                     alpha2=0.5,
-                    limit_alpha2=[0, 3],
                     t1=t1_guess,
-                    fix_t1=False,
-                    limit_t1=[0, None],
                     s=1,
-                    limit_s=[0.01, 20],
                 )
 
             elif model == "SPL":
                 chi2_func = Chi2Functor_lc(SPL_lc, time, y, yerr_)
                 kwdarg = dict(
-                    pedantic=True,
-                    print_level=print_level,
                     F0=F0_guess,
-                    fix_F0=True,
                     norm=norm_guess,
-                    fix_norm=False,
-                    limit_norm=(0.1, 10),
                     alpha=1,
-                    limit_alpha=[-10, 10],
                     t0=t1_guess,
-                    fix_t0=True,
-                    limit_t0=[0, None],
                 )
             # print (describe(chi2_func))
             else:
@@ -144,10 +126,36 @@ def fit_lc(observations, grb_info, model, method="best", print_level=0):
                 )
 
             m = Minuit(chi2_func, **kwdarg)
+            # assign print_level
+            m.print_level = print_level
 
-            m.set_strategy(1)
+            # Fixed parameters
+            m.fixed["F0"] = True
+            m.fixed["norm"] = True
+            if model == "BPL":
+                m.fixed["alpha1"] = False
+                m.fixed["alpha2"] = False
+                m.fixed["t1"] = False
+                m.fixed["s"] = False
+            elif model == "SPL":
+                m.fixed["alpha"] = False
+                m.fixed["t0"] = True
+
+            # Set limits to parameter
+            m.limits["norm"] = (0.1, 10)
+            if model == "BPL":
+                m.limits["alpha1"] = (-3, 0)
+                m.limits["alpha2"] = (0, 3)
+                m.limits["t1"] = (0, None)
+                m.limits["s"] = (0.01, 20)
+            elif model == "BPL":
+                m.limits["alpha"] = (-10, 10)
+                m.limits["t0"] = (0, None)
+
+
+            m.strategy = 1
             # m.migrad(nsplit=1,precision=1e-10)
-            d, l = m.migrad()
+            m.migrad()
             # print (band)
             if print_level > 0:
                 print("Valid Minimum: %s " % str(m.migrad_ok()))
@@ -160,7 +168,7 @@ def fit_lc(observations, grb_info, model, method="best", print_level=0):
             nb_obs.append(len(y))
             F0_list.append(m.values["F0"])
             norm_list.append(m.values["norm"])
-            chi2_list.append(d.fval)
+            chi2_list.append(m.fval)
             if model == "SPL":
                 alpha_list.append(m.values["alpha"])
                 t0_list.append(m.values["t0"])
