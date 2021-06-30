@@ -143,13 +143,13 @@ def plot_lc_fit_check(
         )
         if plot:
             plt.show()
-        # plt.close("all")
+        #plt.close("all")
 
 
 def plot_sed(seds, grb_info, plot, model, output_dir="/results/", filename_suffix=""):
     """Plot the extracted SED"""
-    plt.figure()
     for sed in seds.group_by("Name").groups:
+        plt.figure()
         # If redshift and Av are provided in the data file use them
         try:
             z = float(grb_info["z"][grb_info["name"] == sed["Name"][0]][0])
@@ -218,7 +218,7 @@ def plot_sed(seds, grb_info, plot, model, output_dir="/results/", filename_suffi
         )
         if plot:
             plt.show()
-        # plt.close("all")
+        #plt.close("all")
 
 
 def plot_mcmc_evolution(
@@ -312,8 +312,8 @@ def plot_mcmc_evolution(
     )
     if plot:
         plt.show()
-    plt.close(fig)
-    # plt.close("all")
+    #plt.close(fig)
+    #plt.close("all")
 
 
 def plot_triangle(
@@ -402,8 +402,8 @@ def plot_triangle(
     if plot:
         plt.show()
 
-    plt.close(fig)
-    # plt.close("all")
+    #plt.close(fig)
+    #plt.close("all")
 
 
 def plot_mcmc_fit(
@@ -596,7 +596,7 @@ def plot_mcmc_fit(
     )
     if plot:
         plt.show()
-    # plt.close("all")
+    #plt.close("all")
 
 
 def plot_zphot(
