@@ -19,7 +19,7 @@
 #beta_X:-99
 #beta_X_sup:-99
 #beta_X_inf:-99
-band mag mag_err zp phot_sys detection telescope
+band flux flux_err zp flux_unit detection telescope
 r 20.92 0.17 - AB 1 ratir
 i 21.31 0.18 - AB 1 ratir
 Z 20.67 0.11 - AB 1 ratir

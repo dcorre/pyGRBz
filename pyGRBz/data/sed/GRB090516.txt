@@ -21,7 +21,7 @@
 #beta_X_sup:-99
 #beta_X_inf:-99
 ##not added the 0.2 as systematic error in the absolute calibration using the GROND zero points and 2MASS field stars
-##band mag mag_err zp phot_sys ABcorr detection telescope
+##band flux flux_err zp flux_unit ABcorr detection telescope
 ##g 23.6 0.1 - AB -99 1 grond
 ##r 21.44 0.1 - AB -99 1 grond
 ##i 20.38 0.1 - AB -99 1 grond
@@ -30,7 +30,7 @@
 ##H 19.2 0.1 - AB 1.38 1 grond
 ##Ks 19.1 0.2 - AB 1.81 1 grond
 ##adding the 0.2 systematic error in quadrature in the absolute calibration using the GROND zero points and 2MASS field stars
-band mag mag_err zp phot_sys ABcorr detection telescope
+band flux flux_err zp flux_unit ABcorr detection telescope
 g 23.6 0.22 - AB -99 1 grond
 r 21.44 0.22 - AB -99 1 grond
 i 20.38 0.22 - AB -99 1 grond

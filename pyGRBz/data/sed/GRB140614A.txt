@@ -20,7 +20,7 @@
 #beta_X:-99
 #beta_X_sup:-99
 #beta_X_inf:-99
-band mag mag_err zp phot_sys ABcorr detection telescope
+band flux flux_err zp flux_unit detection telescope
 g 21.6 0.05 - AB -99 0 grond
 r 20.6 0.2 - AB -99 1 grond
 i 19.5 0.1 - AB -99 1 grond
