@@ -37,7 +37,6 @@ def resample(x, y, x_new, y_min=None, y_max=None):
 
     xx = []
     yy = []
-
     if x_new[0] <= x[0]:
         xx.append(x_new[0] - (x_new[1] - x_new[0]))
         yy.append(0.0)  # set y to 0 outside the given x range
@@ -363,7 +362,7 @@ def Jy2Mag(info_dict, fluxJy):
 
 
 def angles_conversion(angle, unit1, unit2):
-    """ Returns a degree in radian
+    """Returns a degree in radian
     Parameters
     ---------
     angle: float or array
@@ -382,12 +381,12 @@ def angles_conversion(angle, unit1, unit2):
 
     if unit1 not in ["deg", "rad", "arcmin", "arcsec"]:
         raise ValueError(
-            'incorrect units for unit1\n'
+            "incorrect units for unit1\n"
             'Correct units are "deg","rad","arcmin" and "arcsec"'
         )
     if unit2 not in ["deg", "rad", "arcmin", "arcsec"]:
         raise ValueError(
-            'incorrect units for unit2\n'
+            "incorrect units for unit2\n"
             'Correct units are "deg","rad","arcmin" and "arcsec"'
         )
 
@@ -422,7 +421,7 @@ def angles_conversion(angle, unit1, unit2):
 
 
 def plot_colorfilter(band):
-    """ Associate a color to a given filter for nice plotting
+    """Associate a color to a given filter for nice plotting
     Parameters
     ----------
     band: string
@@ -461,7 +460,7 @@ def plot_colorfilter(band):
 
 
 def mean_efficiency_passband(info_dict, wavelength, passband):
-    """ Computes the mean transmission of a given passband
+    """Computes the mean transmission of a given passband
 
     Parameters
     -----------
@@ -502,19 +501,18 @@ def fun_trapz(x, y, dx=None):
 
 
 def convAB(wavelength, filter_trans):
-    """ Compute the AB magnitude of Vega for the given filter band
-    """
+    """Compute the AB magnitude of Vega for the given filter band"""
     wavelength_vega, flux_vega = sed_vega()  # in (A, erg/s/cm2/A)
     f = interp1d(wavelength_vega, flux_vega, kind="linear")
     flux_vega_resampled = f(wavelength)
-    flux_vega_resampled = flambda_to_fJy(wavelength,
-                                         flux_vega_resampled)
-    convAB = -2.5 * np.log10(np.sum(flux_vega_resampled *
-                                    filter_trans / wavelength *
-                                    np.gradient(wavelength),
-                                    axis=0) /
-                             np.sum(3631 * filter_trans / wavelength *
-                                    np.gradient(wavelength), axis=0))
+    flux_vega_resampled = flambda_to_fJy(wavelength, flux_vega_resampled)
+    convAB = -2.5 * np.log10(
+        np.sum(
+            flux_vega_resampled * filter_trans / wavelength * np.gradient(wavelength),
+            axis=0,
+        )
+        / np.sum(3631 * filter_trans / wavelength * np.gradient(wavelength), axis=0)
+    )
     return convAB
 
 

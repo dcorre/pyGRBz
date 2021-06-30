@@ -9,11 +9,16 @@ import corner
 from pyGRBz.models import Flux_template, SPL_lc, BPL_lc
 
 
-def plot_lc_fit_check(observations, grb_info, lc_fit_params,
-                      model, plot, output_dir="/results/",
-                      filename_suffix=""):
-    """ Plot the fitting light curves
-    """
+def plot_lc_fit_check(
+    observations,
+    grb_info,
+    lc_fit_params,
+    model,
+    plot,
+    output_dir="/results/",
+    filename_suffix="",
+):
+    """Plot the fitting light curves"""
 
     # Go through each grb observations
     for obs_table in observations.group_by("Name").groups:
@@ -49,9 +54,9 @@ def plot_lc_fit_check(observations, grb_info, lc_fit_params,
             # print (time)
             # exptime = obs_table['exptime'][mask]
             xerr = np.ones(len(time)) * 15
-            y = obs_table[mask]["flux"]
+            y = obs_table[mask]["flux_corr"]
             # print (y)
-            yerr_ = obs_table[mask]["flux_err"]
+            yerr_ = obs_table[mask]["flux_corr_err"]
 
             # Select the fit parameters for the corresponding band and
             # telescope
@@ -127,6 +132,7 @@ def plot_lc_fit_check(observations, grb_info, lc_fit_params,
         plt.legend(by_label.values(), by_label.keys(), numpoints=1, loc="best")
         plt.grid(True)
         os.makedirs(os.path.join(output_dir, str(obs_table["Name"][0])), exist_ok=True)
+        plt.tight_layout()
         plt.savefig(
             output_dir
             + str(obs_table["Name"][0])
@@ -137,14 +143,11 @@ def plot_lc_fit_check(observations, grb_info, lc_fit_params,
         )
         if plot:
             plt.show()
-        plt.close("all")
+        # plt.close("all")
 
 
-def plot_sed(seds, grb_info, plot, model, output_dir="/results/",
-             filename_suffix=""):
-    """ Plot the extracted SED
-
-    """
+def plot_sed(seds, grb_info, plot, model, output_dir="/results/", filename_suffix=""):
+    """Plot the extracted SED"""
     plt.figure()
     for sed in seds.group_by("Name").groups:
         # If redshift and Av are provided in the data file use them
@@ -163,26 +166,38 @@ def plot_sed(seds, grb_info, plot, model, output_dir="/results/",
         colors = [cmap(i) for i in np.linspace(0, 1, len(sed["band"]) + 1)]
 
         for i, band_table in enumerate(
-            sed.group_by(["eff_wvl", "telescope", "band", "band_width",
-                          "mag", "mag_err", "detection"]).groups.keys):
+            sed.group_by(
+                [
+                    "eff_wvl",
+                    "telescope",
+                    "band",
+                    "band_width",
+                    "flux_corr",
+                    "flux_corr_err",
+                    "detection",
+                ]
+            ).groups.keys
+        ):
             if band_table["detection"] == 0:
-                yerr = 0.5
+                # arbitrary, only for visualisation
+                yerr = 0.2 * band_table["flux_corr"]
             else:
-                yerr = band_table["mag_err"]
+                yerr = band_table["flux_corr_err"]
             plt.errorbar(
                 band_table["eff_wvl"],
-                band_table["mag"],
+                band_table["flux_corr"],
                 xerr=band_table["band_width"] / 2,
                 yerr=yerr,
-                lolims=1 - band_table["detection"],
+                uplims=1 - band_table["detection"],
                 label=band_table["telescope"] + " " + band_table["band"],
                 color=colors[i],
             )
         plt.xlabel(r"$\lambda$ [angstroms]")
         # plt.ylabel(r'Flux ($\mu$Jy)')
-        plt.ylabel("Mag AB")
-        plt.xlim(sed["eff_wvl"][0] / 2, sed["eff_wvl"][-1] * 1.3)
-        plt.ylim(min(sed["mag"]) - 3, max(sed["mag"]) + 3)
+        plt.ylabel("Flux (microJy)")
+        # plt.xlim(sed["eff_wvl"][0] / 2, sed["eff_wvl"][-1] * 1.5)
+        # plt.xlim(0, sed["eff_wvl"][-1] * 1.5)
+        # plt.ylim(min(sed["flux_corr"]) - 3, max(sed["flux_corr"]) + 3)
         # plt.ylim(max(sed['mag'])+3,min(sed['mag'])-3)
         plt.title(
             "%s SED extracted at T-To=%.0f sec \n z=%.2f, Av_host=%.2f"
@@ -190,6 +205,9 @@ def plot_sed(seds, grb_info, plot, model, output_dir="/results/",
         )
         plt.grid(True)
         plt.legend(numpoints=1)
+        plt.yscale("log")
+        plt.xscale("log")
+        plt.tight_layout()
         plt.savefig(
             output_dir
             + str(sed["Name"][0])
@@ -200,16 +218,26 @@ def plot_sed(seds, grb_info, plot, model, output_dir="/results/",
         )
         if plot:
             plt.show()
-        plt.close("all")
+        # plt.close("all")
 
 
-def plot_mcmc_evolution(samples_corr, samples_del, nburn, ndim, ext_law,
-                        Av_sim, z_sim, name, plot, plot_deleted,
-                        output_dir="/test/", filename_suffix="",
-                        priors=dict(z=[0, 11], Av=[0, 2],
-                                    beta=[0, 2], norm=[0, 10])):
-    """ Plot the chains evolution
-    """
+def plot_mcmc_evolution(
+    samples_corr,
+    samples_del,
+    nburn,
+    ndim,
+    ext_law,
+    Host_gas,
+    Av_sim,
+    z_sim,
+    name,
+    plot,
+    plot_deleted,
+    output_dir="/test/",
+    filename_suffix="",
+    priors=dict(z=[0, 11], Av=[0, 2], beta=[0, 2], NHx=[0.1, 100], norm=[0, 10]),
+):
+    """Plot the chains evolution"""
     i = 0
     fig, axes = plt.subplots(ndim, 1, sharex=True)
     axes[i].plot(samples_corr[:, :, 0].T, color="grey", alpha=0.6)
@@ -217,7 +245,7 @@ def plot_mcmc_evolution(samples_corr, samples_del, nburn, ndim, ext_law,
     axes[i].set_ylabel("z")
     axes[i].set_ylim(priors["z"][0], priors["z"][1])
     i += 1
-    if ndim == 4:
+    if ext_law != "nodust":
         axes[i].plot(samples_corr[:, :, 3].T, color="grey", alpha=0.6)
         axes[i].axvline(x=nburn, linewidth=1, linestyle="--", color="red")
         axes[i].set_ylabel(r"$ A_{V} $")
@@ -228,22 +256,40 @@ def plot_mcmc_evolution(samples_corr, samples_del, nburn, ndim, ext_law,
     axes[i].set_ylabel(r"$ \beta $")
     axes[i].set_ylim(priors["beta"][0], priors["beta"][1])
     i += 1
+    if Host_gas is True:
+        if ext_law == "nodust":
+            idx = 3
+        else:
+            idx = 4
+        axes[i].plot(samples_corr[:, :, idx].T, color="grey", alpha=0.6)
+        axes[i].axvline(x=nburn, linewidth=1, linestyle="--", color="red")
+        axes[i].set_ylabel(r"$ NH_{x} $")
+        axes[i].set_ylim(priors["NHx"][0], priors["NHx"][1])
+        i += 1
+
     axes[i].plot(samples_corr[:, :, 2].T, color="grey", alpha=0.6)
     axes[i].axvline(x=nburn, linewidth=1, linestyle="--", color="red")
     axes[i].set_ylabel("norm")
     axes[i].set_xlabel("steps")
-    axes[i].set_ylim(priors["norm"][0], priors["norm"][1])
+    # axes[i].set_ylim(priors["norm"][0], priors["norm"][1])
 
     # axes[i].set_ylim(0,2)
     i = 0
     if plot_deleted and samples_del is not None:
         axes[i].plot(samples_del[:, :, 0].T, color="red", alpha=0.1)
         i += 1
-        if ndim == 4:
+        if ext_law != "nodust":
             axes[i].plot(samples_del[:, :, 3].T, color="red", alpha=0.1)
             i += 1
         axes[i].plot(samples_del[:, :, 1].T, color="red", alpha=0.1)
         i += 1
+        if Host_gas is True:
+            if ext_law == "nodust":
+                idx = 3
+            else:
+                idx = 4
+            axes[i].plot(samples_del[:, :, idx].T, color="red", alpha=0.1)
+            i += 1
         axes[i].plot(samples_del[:, :, 2].T, color="red", alpha=0.1)
 
     fig.gca().annotate(
@@ -255,6 +301,7 @@ def plot_mcmc_evolution(samples_corr, samples_del, nburn, ndim, ext_law,
         ha="center",
         va="top",
     )
+    plt.tight_layout()
     fig.savefig(
         output_dir
         + str(name)
@@ -266,155 +313,223 @@ def plot_mcmc_evolution(samples_corr, samples_del, nburn, ndim, ext_law,
     if plot:
         plt.show()
     plt.close(fig)
-    plt.close("all")
+    # plt.close("all")
 
 
-def plot_triangle(samples, ndim, z_sim, ext_law, Av_sim, beta_sim, name,
-                  plot, plot_deleted, filename_suffix="", output_dir="/test/",
-                  priors=dict(z=[0, 11], Av=[0, 2],
-                              beta=[0, 2], norm=[0, 10])):
+def plot_triangle(
+    samples,
+    ndim,
+    z_sim,
+    ext_law,
+    Host_gas,
+    Av_sim,
+    beta_sim,
+    name,
+    plot,
+    plot_deleted,
+    filename_suffix="",
+    output_dir="/test/",
+    priors=dict(z=[0, 11], Av=[0, 2], beta=[0, 2], NHx=[0.1, 100], norm=[0, 10]),
+):
     """ Plot the triangle """
-    if ndim == 3:
-        fig = corner.corner(
-            samples,
-            labels=["z", "beta", "norm"],
-            truths=[z_sim, beta_sim, -1],
-            bins=50,
-            range=[(priors["z"][0], priors["z"][1]),
-                   (priors["Av"][0], priors["Av"][1]),
-                   1.0],
-            levels=[0.68, 0.95, 0.99],
-            plot_contours=True,
-            fill_contours=True,
-            plot_datapoints=False,
-            color="blue",
-            scale_hist=True,
-        )
+    if ext_law == "nodust" and Host_gas is False:
+        labels = ["z", "beta", "norm"]
+        truths = [z_sim, beta_sim, -1]
+        range_val = [
+            (priors["z"][0], priors["z"][1]),
+            (priors["Av"][0], priors["Av"][1]),
+            1.0,
+        ]
+    elif ext_law != "nodust" and Host_gas is False:
+        labels = ["z", "Av", "beta", "norm"]
+        truths = [z_sim, Av_sim, -1, -1]
+        range_val = [
+            (priors["z"][0], priors["z"][1]),
+            (priors["Av"][0], priors["Av"][1]),
+            (priors["beta"][0], priors["beta"][1]),
+            # (priors["norm"][0], priors["norm"][1])
+            1.0,
+        ]
+    elif ext_law == "nodust" and Host_gas is True:
+        labels = ["z", "beta", "NHx", "norm"]
+        truths = [z_sim, -1, -1, -1]
+        range_val = [
+            (priors["z"][0], priors["z"][1]),
+            (priors["beta"][0], priors["beta"][1]),
+            (priors["NHx"][0], priors["NHx"][1]),
+            # (priors["norm"][0], priors["norm"][1])
+            1.0,
+        ]
+    elif ext_law != "nodust" and Host_gas is True:
+        labels = ["z", "Av", "beta", "NHx", "norm"]
+        truths = [z_sim, Av_sim, -1, -1, -1]
+        range_val = [
+            (priors["z"][0], priors["z"][1]),
+            (priors["Av"][0], priors["Av"][1]),
+            (priors["beta"][0], priors["beta"][1]),
+            (priors["NHx"][0], priors["NHx"][1]),
+            # (priors["norm"][0], priors["norm"][1])
+            1.0,
+        ]
 
-        fig.gca().annotate(
-            "zsim: %.2f    Av_sim: %.2f " % (z_sim, Av_sim),
-            xy=(0.5, 1.0),
-            xycoords="figure fraction",
-            xytext=(0, -5),
-            textcoords="offset points",
-            ha="center",
-            va="top",
-        )
-        fig.savefig(
-            output_dir
-            + str(name)
-            + "/triangle_plot_"
-            + ext_law
-            + filename_suffix
-            + ".png"
-        )
-        # plt.title('zsim: %.2f    Av_sim: %.2f ' % (z_sim,Av_sim))
+    fig = corner.corner(
+        samples,
+        labels=labels,
+        truths=truths,
+        bins=50,
+        range=range_val,
+        levels=[0.68, 0.95, 0.99],
+        plot_contours=True,
+        fill_contours=True,
+        plot_datapoints=False,
+        color="blue",
+        scale_hist=True,
+    )
 
-    elif ndim == 4:
-        fig = corner.corner(
-            samples,
-            labels=["z", "Av", "beta", "norm"],
-            truths=[z_sim, Av_sim, -1, -1],
-            bins=50,
-            range=[(priors["z"][0], priors["z"][1]),
-                   (priors["Av"][0], priors["Av"][1]),
-                   (priors["beta"][0], priors["beta"][1]),
-                   1.0],
-            levels=[0.68, 0.95, 0.99],
-            plot_contours=True,
-            fill_contours=True,
-            plot_datapoints=False,
-            color="blue",
-            scale_hist=True,
-        )
-
-        fig.gca().annotate(
-            "zsim: %.2f    Av_sim: %.2f " % (z_sim, Av_sim),
-            xy=(0.5, 1.0),
-            xycoords="figure fraction",
-            xytext=(0, -5),
-            textcoords="offset points",
-            ha="center",
-            va="top",
-        )
-        fig.savefig(
-            output_dir
-            + str(name)
-            + "/triangle_plot_"
-            + ext_law
-            + filename_suffix
-            + ".png"
-        )
+    fig.gca().annotate(
+        "zsim: %.2f    Av_sim: %.2f " % (z_sim, Av_sim),
+        xy=(0.5, 1.0),
+        xycoords="figure fraction",
+        xytext=(0, -5),
+        textcoords="offset points",
+        ha="center",
+        va="top",
+    )
+    plt.tight_layout()
+    fig.savefig(
+        output_dir + str(name) + "/triangle_plot_" + ext_law + filename_suffix + ".png"
+    )
     if plot:
         plt.show()
+
     plt.close(fig)
-    plt.close("all")
+    # plt.close("all")
 
 
-def plot_mcmc_fit(results, ndim, results_minL, sed, wavelength,
-                  samples, plot_all, plot, ext_law, Host_dust,
-                  Host_gas, MW_dust, MW_gas, DLA, igm_att,
-                  output_dir="/test/",
-                  filename_suffix=""):
+def plot_mcmc_fit(
+    results,
+    ndim,
+    best_chi2_val,
+    sed,
+    wavelength,
+    samples,
+    plot_all,
+    plot,
+    ext_law,
+    Host_dust,
+    Host_gas,
+    MW_dust,
+    MW_gas,
+    DLA,
+    igm_att,
+    output_dir="/test/",
+    filename_suffix="",
+):
     """
     Plot the flux template corresponding to the best fit of the mcmc
     """
     z_sim = results["z_sim"][0]
     Av_sim = results["Av_host_sim"][0]
     # print (sed)
-    F0 = sed["flux"][np.argmax(sed["eff_wvl"])]
-    wvl0 = sed["eff_wvl"][np.argmax(sed["eff_wvl"])]
+    mask = sed["detection"] == 1
+    F0 = sed["flux_corr"][np.argmax(sed["eff_wvl"][mask])]
+    wvl0 = sed["eff_wvl"][np.argmax(sed["eff_wvl"][mask])]
 
     z_fit = results["zphot_68"][0]
     Av_fit = results["Av_68"][0]
     beta_fit = results["beta_68"][0]
     norm_fit = results["norm_68"][0]
+    NHx_fit = results["NHx_68"][0]
 
-    z_minL = results_minL[0]
-    beta_minL = results_minL[1]
-    norm_minL = results_minL[2]
+    z_minL = best_chi2_val["z"]
+    beta_minL = best_chi2_val["beta"]
+    norm_minL = best_chi2_val["norm"]
+    Av_minL = best_chi2_val["Av"]
+    NHx_minL = best_chi2_val["NHx"]
 
-    if ndim == 3:
-        Av_minL = 0
-    elif ndim == 4:
-        Av_minL = results_minL[3]
-
+    print("\nFor best SED plot:")
     print(
-        "median values PDF: {:.3f} {:.3f} {:.3f} {:.3f}".format(
+        "- Median values PDF: {:.3f} {:.3f} {:.3f} {:.3f}".format(
             z_fit, Av_fit, beta_fit, norm_fit
         )
     )
 
     print(
-        "best fit: {:.3f} {:.3f} {:.3f} {:.3f}".format(
+        "- Best fit: {:.3f} {:.3f} {:.3f} {:.3f}".format(
             z_minL, Av_minL, beta_minL, norm_minL
         )
     )
 
-    flux_median = Flux_template(wavelength, F0, wvl0, norm_fit, beta_fit,
-                                z_fit, Av_fit, ext_law, Host_dust, Host_gas,
-                                MW_dust, MW_gas, DLA, igm_att)
-    flux_minL = Flux_template(wavelength, F0, wvl0, norm_minL, beta_minL,
-                              z_minL, Av_minL, ext_law, Host_dust, Host_gas,
-                              MW_dust, MW_gas, DLA, igm_att)
+    flux_median = Flux_template(
+        wavelength,
+        F0,
+        wvl0,
+        norm_fit,
+        beta_fit,
+        z_fit,
+        Av_fit,
+        NHx_fit,
+        ext_law,
+        Host_dust,
+        Host_gas,
+        MW_dust,
+        MW_gas,
+        DLA,
+        igm_att,
+    )
+    flux_minL = Flux_template(
+        wavelength,
+        F0,
+        wvl0,
+        norm_minL,
+        beta_minL,
+        z_minL,
+        Av_minL,
+        NHx_minL,
+        ext_law,
+        Host_dust,
+        Host_gas,
+        MW_dust,
+        MW_gas,
+        DLA,
+        igm_att,
+    )
     plt.figure()
-    plt.plot(wavelength, flux_median, label="median", ls="--",
-             lw=1.5, color="blue")
+    plt.plot(wavelength, flux_median, label="median", ls="--", lw=1.5, color="blue")
     plt.plot(wavelength, flux_minL, label="best fit", lw=1.5, color="green")
 
     if plot_all:
-        if ndim == 3:
+        if ext_law == "nodust" and Host_gas is False:
             for (z, beta, norm) in samples:
-                plt.plot(wavelength,
-                         Flux_template(wavelength, F0, wvl0, norm,
-                                       beta, z, 0, ext_law),
-                         color="k", alpha=0.01)
-        elif ndim == 4:
+                plt.plot(
+                    wavelength,
+                    Flux_template(wavelength, F0, wvl0, norm, beta, z, 0, 0, ext_law),
+                    color="k",
+                    alpha=0.01,
+                )
+        elif ext_law != "nodust" and Host_gas is False:
             for (z, beta, norm, Av) in samples:
                 plt.plot(
                     wavelength,
-                    Flux_template(wavelength, F0, wvl0, norm, beta,
-                                  z, Av, ext_law),
+                    Flux_template(wavelength, F0, wvl0, norm, beta, z, Av, 0, ext_law),
+                    color="k",
+                    alpha=0.01,
+                )
+        elif ext_law == "nodust" and Host_gas is True:
+            for (z, beta, norm, NHx) in samples:
+                plt.plot(
+                    wavelength,
+                    Flux_template(wavelength, F0, wvl0, norm, beta, z, 0, NHx, ext_law),
+                    color="k",
+                    alpha=0.01,
+                )
+        elif ext_law != "nodust" and Host_gas is True:
+            for (z, beta, norm, Av, NHx) in samples:
+                plt.plot(
+                    wavelength,
+                    Flux_template(
+                        wavelength, F0, wvl0, norm, beta, z, Av, NHx, ext_law
+                    ),
                     color="k",
                     alpha=0.01,
                 )
@@ -428,10 +543,10 @@ def plot_mcmc_fit(results, ndim, results_minL, sed, wavelength,
         if sed["detection"][i] == 0:
             yerr = 0.3
         else:
-            yerr = sed["flux_err"][i]
+            yerr = sed["flux_corr_err"][i]
         plt.errorbar(
             sed["eff_wvl"][i],
-            sed["flux"][i],
+            sed["flux_corr"][i],
             xerr=sed["band_width"][i] / 2,
             yerr=yerr,
             uplims=1 - sed["detection"][i],
@@ -440,7 +555,7 @@ def plot_mcmc_fit(results, ndim, results_minL, sed, wavelength,
         )
         plt.annotate(
             sed["band"][i],
-            xy=(sed["eff_wvl"][i], max(sed["flux"]) * 1.3),
+            xy=(sed["eff_wvl"][i], max(sed["flux_corr"]) * 1.3),
             color=colors[i],
             fontsize=16,
             horizontalalignment="right",
@@ -449,14 +564,15 @@ def plot_mcmc_fit(results, ndim, results_minL, sed, wavelength,
     plt.xlabel(r"Observed wavelength [angstroms]", fontsize=14)
     # plt.ylabel(r'Flux ($\mu$Jy)')
     plt.ylabel(r"Flux [$\mu$Jy]", fontsize=14)
-    plt.xlim(sed["eff_wvl"][0] / 2, sed["eff_wvl"][-1] * 1.3)
-    plt.ylim(min(sed["flux"]) * 0.1, max(sed["flux"]) * 2.3)
+    # plt.xlim(sed["eff_wvl"][0] / 2, sed["eff_wvl"][-1] * 1.3)
+    plt.ylim(min(sed["flux_corr"]) * 0.1, max(sed["flux_corr"]) * 2.3)
     # plt.ylim(1,400)
     plt.title(
         "SED extracted at T-To=%.0f sec\n z_sim=%.2f, Av_sim=%.2f"
         % (float(sed["time_since_burst"][0]), float(z_sim), float(Av_sim))
     )
     plt.yscale("log")
+    plt.xscale("log")
     plt.grid(True)
     name_tel = sed["telescope"][0]
     if name_tel not in ["ratir", "grond", "gft"]:
@@ -469,6 +585,7 @@ def plot_mcmc_fit(results, ndim, results_minL, sed, wavelength,
     )
     # set the legend title size
     plt.setp(plt.gca().get_legend().get_title(), fontsize="16")
+    plt.tight_layout()
     plt.savefig(
         output_dir
         + str(sed["Name"][0])
@@ -479,11 +596,17 @@ def plot_mcmc_fit(results, ndim, results_minL, sed, wavelength,
     )
     if plot:
         plt.show()
-    plt.close("all")
+    # plt.close("all")
 
 
-def plot_zphot(input_file, output_suffix, sigma, input_dir="/results/",
-               output_dir="/plots/", plot=True):
+def plot_zphot(
+    input_file,
+    output_suffix,
+    sigma,
+    input_dir="/results/",
+    output_dir="/plots/",
+    plot=True,
+):
     """
     Plots zphot vs zsim.
     No inputs required, the plot is saved in plots/ (default)
@@ -589,15 +712,26 @@ def plot_zphot(input_file, output_suffix, sigma, input_dir="/results/",
     # Fake data for generating legend
     for i, mar in enumerate(markers[: np.max(nb_bands)]):
         plt.scatter(-1, -1, marker=mar, label=str(i + 1), color="black")
-    plt.legend(loc="upper left", scatterpoints=1, ncol=2, fontsize=8,
-               title="Nb of bands\n with detection")
+    plt.legend(
+        loc="upper left",
+        scatterpoints=1,
+        ncol=2,
+        fontsize=8,
+        title="Nb of bands\n with detection",
+    )
     x = np.arange(0, 12, 1)
     for i, nb_det in enumerate(nb_detections):
-        plt.scatter([zsim[i]], [zphot[i]], c=[Avsim[i]], cmap=plt.cm.jet,
-                    marker=markers[int(nb_det - 1)], vmin=min(Avsim),
-                    vmax=max(Avsim), s=50)
-    plt.fill_between(list(zsim), list(z_inf), list(z_sup), color="blue",
-                     alpha=0.3)
+        plt.scatter(
+            [zsim[i]],
+            [zphot[i]],
+            c=[Avsim[i]],
+            cmap=plt.cm.jet,
+            marker=markers[int(nb_det - 1)],
+            vmin=min(Avsim),
+            vmax=max(Avsim),
+            s=50,
+        )
+    plt.fill_between(list(zsim), list(z_inf), list(z_sup), color="blue", alpha=0.3)
     plt.plot(x, x, ls="--", color="red", lw=0.5)
     plt.xlabel(r"$z_{sim}$", fontsize=15)
     plt.ylabel(r"$z_{phot}$", fontsize=15)
@@ -615,17 +749,33 @@ def plot_zphot(input_file, output_suffix, sigma, input_dir="/results/",
     # Fake data for generating legend
     for i, mar in enumerate(markers[: np.max(nb_bands)]):
         plt.scatter(-1, -1, marker=mar, label=str(i + 1), color="black")
-    plt.legend(loc="upper left", scatterpoints=1, ncol=2,
-               fontsize=8, title="Nb of bands\n with detection")
+    plt.legend(
+        loc="upper left",
+        scatterpoints=1,
+        ncol=2,
+        fontsize=8,
+        title="Nb of bands\n with detection",
+    )
 
     x = np.arange(0, 12, 1)
     for i, nb_det in enumerate(nb_detections):
-        plt.scatter([zsim[i]], [zphot[i] - zsim[i]], c=[Avsim[i]],
-                    cmap=plt.cm.jet, vmin=min(Avsim), vmax=max(Avsim),
-                    marker=markers[int(nb_det - 1)], s=50)
-    plt.fill_between(list(zsim), list(np.array(z_inf) - np.array(zsim)),
-                     list(np.array(z_sup) - np.array(zsim)),
-                     color="blue", alpha=0.3)
+        plt.scatter(
+            [zsim[i]],
+            [zphot[i] - zsim[i]],
+            c=[Avsim[i]],
+            cmap=plt.cm.jet,
+            vmin=min(Avsim),
+            vmax=max(Avsim),
+            marker=markers[int(nb_det - 1)],
+            s=50,
+        )
+    plt.fill_between(
+        list(zsim),
+        list(np.array(z_inf) - np.array(zsim)),
+        list(np.array(z_sup) - np.array(zsim)),
+        color="blue",
+        alpha=0.3,
+    )
     plt.xlabel(r"$z_{sim}$", fontsize=15)
     plt.ylabel(r"$z_{phot}-z_{sim}$", fontsize=15)
     plt.xlim(0, 11)
@@ -642,15 +792,26 @@ def plot_zphot(input_file, output_suffix, sigma, input_dir="/results/",
     # Fake data for generating legend
     for i, mar in enumerate(markers[: np.max(nb_bands)]):
         plt.scatter(-1, -1, marker=mar, label=str(i + 1), color="black")
-    plt.legend(loc="upper left", scatterpoints=1, ncol=2, fontsize=8,
-               title="Nb of bands\n with detection")
+    plt.legend(
+        loc="upper left",
+        scatterpoints=1,
+        ncol=2,
+        fontsize=8,
+        title="Nb of bands\n with detection",
+    )
 
     x = np.arange(0, 12, 1)
     for i, nb_det in enumerate(nb_detections):
-        plt.scatter([zsim[i]], [(zphot[i] - zsim[i]) / (1 + zsim[i])],
-                    c=[Avsim[i]], cmap=plt.cm.jet, vmin=min(Avsim),
-                    vmax=max(Avsim), marker=markers[int(nb_det - 1)],
-                    s=50)
+        plt.scatter(
+            [zsim[i]],
+            [(zphot[i] - zsim[i]) / (1 + zsim[i])],
+            c=[Avsim[i]],
+            cmap=plt.cm.jet,
+            vmin=min(Avsim),
+            vmax=max(Avsim),
+            marker=markers[int(nb_det - 1)],
+            s=50,
+        )
     plt.fill_between(
         list(zsim),
         list((np.array(z_inf) - np.array(zsim)) / (1 + np.array(zsim))),
@@ -672,8 +833,7 @@ def plot_zphot(input_file, output_suffix, sigma, input_dir="/results/",
 
 
 def plot_zphot_comp():
-    """
-    """
+    """"""
 
     path = "results/"
     filename_1 = path + "best_fits_tot_68_emp" + ".dat"

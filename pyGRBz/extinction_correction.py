@@ -1,16 +1,35 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
+#import time
 import sys
 import numpy as np
 from astropy.table import Column
-from pyGRBaglow.igm import (meiksin, madau, dla)
+from pyGRBaglow.igm import madau, dla
 from pyGRBaglow.reddening import reddening
 
+# Import cythonised code if present
+try:
+    from pyGRBaglow.igm_cy import meiksin
+except:
+    from pyGRBaglow.igm import meiksin
 
-def sed_extinction(wavelength, z, Av, ext_law, Host_dust=True,
-                   Host_gas=False, MW_dust=True, MW_gas=False,
-                   DLA=False, igm_att="Meiksin"):
+
+def sed_extinction(
+    wavelength,
+    z,
+    Av,
+    ext_law,
+    Host_dust=True,
+    Host_gas=False,
+    MW_dust=True,
+    MW_gas=False,
+    DLA=False,
+    igm_att="Meiksin",
+    NHx=1,
+    NHI=20,
+    Av_local=0.1,
+):
     """
     Computes the total transmission per wavelength at a given redshift.
     It can include different mechanism: dust extinction, photoelectric
@@ -57,65 +76,73 @@ def sed_extinction(wavelength, z, Av, ext_law, Host_dust=True,
     trans_tot: array
         total transmission on the line of sight
     """
-
+    #tt00 = time.time()
     #  Make sure wavelength is an array
     wavelength = np.atleast_1d(wavelength)
 
     # Optical extinction coefficient for our galaxy
     # Default value
-    Av_local = 0.1
+    Av_local = Av_local
 
     # Metal Column density in units of 1e22cm-2/mag
-    NHX = 1
+    NHX = NHx
 
     # Hydrogen column density at GRB redshift for DLA
-    NHI = 20
+    NHI = NHI
 
-    Trans_tot = np.ones(len(wavelength))
-
+    Trans_tot = np.ones(len(wavelength), dtype=np.float64)
+    #tt0 = time.time()
     # ------------------------------------
     #  Calculate extinction along the los
     # -------------------------------------
     if ext_law != "nodust" and Host_dust:
         # Transmission due to host galaxy reddening
         Trans_tot *= reddening(wavelength, z, Av).Pei92(ext_law=ext_law)[1]
+        # tt1 = time.time()
 
     if MW_dust:
         # Transmission due to local galactic reddening
-        Trans_tot *= reddening(wavelength,
-                               0.0, Av_local).Pei92(ext_law="MW")[1]
+        Trans_tot *= reddening(wavelength, 0.0, Av_local).Pei92(ext_law="MW")[1]
 
     if Host_gas:
         # Transmission due to host galaxy gas extinction
         Trans_tot *= reddening(wavelength, z, Av).gas_absorption(NHx=NHX)
+        # tt2 = time.time()
 
     if MW_gas:
         # Transmission due to local galactic gas extinction
-        Trans_tot *= reddening(wavelength,
-                               0.0, Av_local).gas_absorption(NHx=0.2)
+        Trans_tot *= reddening(wavelength, 0.0, Av_local).gas_absorption(NHx=0.2)
 
     if igm_att.lower() == "meiksin":
+        # tt2 = time.time()
         # Add IGM attenuation using Meiksin 2006 model
-        Trans_tot *= meiksin(wavelength / 10, z)
+        Trans_tot *= meiksin(wavelength / 10.0, z, Xcut=True)
+        # tt3 = time.time()
     elif igm_att.lower() == "madau":
         # Add IGM attenuation using Madau 1995 model
-        Trans_tot *= madau(wavelength, z)
+        Trans_tot *= madau(wavelength, z, Xcut=True)
+        # tt3 = time.time()
     else:
         sys.exit(
-            'Model %s for IGM attenuation not known\n'
-            'It should be either "Madau" or "Meiksin" '
-            % igm_att
+            "Model %s for IGM attenuation not known\n"
+            'It should be either "Madau" or "Meiksin" ' % igm_att
         )
 
     if DLA:
         # Add DLA at GRB redshift
         Trans_tot *= dla(wavelength, z, NHI)
 
+    # print ("Extinction time dust: {:.2e}s".format(tt1-tt0))
+    # print ("Extinction time gas: {:.2e}s".format(tt2-tt1))
+    # print ("Extinction time igm: {:.2e}s".format(tt3-tt2))
+    # print ("Extinction time total: {:.2e}s".format(tt3-tt00))
+
     return Trans_tot
 
 
-def correct_MW_ext(data, grb_info, wavelength, recalibration="no",
-                   dustmapdir="Default"):
+def correct_MW_ext(
+    data, grb_info, wavelength, recalibration="no", dustmapdir="Default"
+):
     """
     Correct the data from extinction occuring in the line of sight in
     the Milky Way.
@@ -125,12 +152,12 @@ def correct_MW_ext(data, grb_info, wavelength, recalibration="no",
     from astropy.coordinates import SkyCoord
     import extinction
     import pkg_resources
+
     # from scipy.interpolate import interp1d
 
     if dustmapdir == "Default":
         #  Get the path to the directory where the dust maps are
-        dustmapdir = pkg_resources.resource_filename("pyGRBaglow",
-                                                     "galactic_dust_maps")
+        dustmapdir = pkg_resources.resource_filename("pyGRBaglow", "galactic_dust_maps")
 
     #  Add column in data for the galctic extinction in mag
     col_band_extmag = Column(name="ext_mag", data=np.zeros((len(data))))
@@ -139,8 +166,7 @@ def correct_MW_ext(data, grb_info, wavelength, recalibration="no",
     for grb in grb_info.group_by(["name"]).groups:
         mask = data["Name"] == grb["name"]
 
-        if "MW_corrected" in grb.colnames and\
-                grb["MW_corrected"][0].lower() == "no":
+        if "MW_corrected" in grb.colnames and grb["MW_corrected"][0].lower() == "no":
             # load dust map
             # If original value from  Schlegel, Finkbeiner & Davis (1998)
             # use scaling=1.0
@@ -153,15 +179,12 @@ def correct_MW_ext(data, grb_info, wavelength, recalibration="no",
 
             try:
                 #  Coordinates in hmsdms
-                grb_coord = SkyCoord(grb["RA_J2000"],
-                                     grb["DEC_J2000"],
-                                     frame="icrs")
+                grb_coord = SkyCoord(grb["RA_J2000"], grb["DEC_J2000"], frame="icrs")
             except:
                 # else assumes that it is given in degrees
-                grb_coord = SkyCoord(grb["RA_J2000"],
-                                     grb["DEC_J2000"],
-                                     frame="icrs",
-                                     unit="deg")
+                grb_coord = SkyCoord(
+                    grb["RA_J2000"], grb["DEC_J2000"], frame="icrs", unit="deg"
+                )
 
             # transfrom coord in (RA, Dec) in degrees in the ICRS
             # (e.g.,"J2000") system
@@ -169,8 +192,10 @@ def correct_MW_ext(data, grb_info, wavelength, recalibration="no",
             # Schlegel et al. 1998 (ApJ 500, 525)
             # E_BV=m.get_ebv((grb_coord.ra,grb_coord.dec))
             E_BV = m.ebv((grb_coord.ra, grb_coord.dec))
-            print("\nReddening along the line of sight of"
-                  "{0:s}: E(B-V) = {1:.3f}\n".format(grb["name"][0], E_BV[0]))
+            print(
+                "\nReddening along the line of sight of"
+                "{0:s}: E(B-V) = {1:.3f}\n".format(grb["name"][0], E_BV[0])
+            )
             # Compute the extinction according to Cardelli 1989
             Rv = 3.1
             A_lambda = extinction.ccm89(wavelength, Rv * E_BV, Rv)
@@ -183,9 +208,7 @@ def correct_MW_ext(data, grb_info, wavelength, recalibration="no",
             for table in data[mask]:
                 mask1 = mask.copy()
                 mask1[mask1 == True] = data[mask1]["Name"] == table["Name"]
-                mask1[mask1 == True] = (
-                    data[mask1]["telescope"] == table["telescope"]
-                )
+                mask1[mask1 == True] = data[mask1]["telescope"] == table["telescope"]
                 mask1[mask1 == True] = data[mask1]["band"] == table["band"]
                 mask1[mask1 == True] = (
                     data[mask1]["time_since_burst"] == table["time_since_burst"]

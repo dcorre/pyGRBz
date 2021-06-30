@@ -55,11 +55,11 @@ def _read_ascii(f, **kwargs):
             if pos in [-1, 1]:
                 pass  # comment line
             if line[1:pos].strip().lower() == "name":
-                grb_name = str(line[pos+1:].strip())
+                grb_name = str(line[pos + 1 :].strip())
             if line[1:pos].strip().lower() == "type":
-                grb_format = str(line[pos+1:].strip())
+                grb_format = str(line[pos + 1 :].strip())
             if line[1:pos].strip().lower() == "time_since_burst":
-                time = str(line[pos+1:].strip())
+                time = str(line[pos + 1 :].strip())
 
         pos = line.find(commentchar)
         if pos > -1:
@@ -189,7 +189,7 @@ def read_lc(file_or_dir, format="ascii", **kwargs):
 
 
 def load_observations(filenames):
-    """ Load observations, either a light curve or sed
+    """Load observations, either a light curve or sed
 
     Returns
     -------
@@ -209,7 +209,7 @@ def load_observations(filenames):
 
 
 def load_info_observations(filenames):
-    """ Load observations, either a light curve or sed
+    """Load observations, either a light curve or sed
 
     Returns
     -------
@@ -244,7 +244,7 @@ def load_info_observations(filenames):
                         continue  # comment line
                     ref = line[1:pos].strip()
                     references.append(ref)
-                    val = line[pos+1:].strip()
+                    val = line[pos + 1 :].strip()
                     values.append(val)
         data = Table(np.array(values), names=list(references))
         data_list.append(data)
@@ -257,8 +257,9 @@ def load_info_observations(filenames):
     return data_info
 
 
-def load_telescope_transmissions(info_dict, wavelength,
-                                 norm=False, norm_val=1.0):
+def load_telescope_transmissions(
+    info_dict, wavelength, norm=False, norm_val=1.0, resamp=True
+):
     """
     Load the transmittance of the selected band of the selected
     telescope with respect to wavelength
@@ -311,6 +312,7 @@ def load_telescope_transmissions(info_dict, wavelength,
     if norm:
         trans = trans / max(trans) * norm_val
 
-    # Resample the transmission to the
-    trans = resample(wvl, trans, wavelength, 0.0, 1.0)
-    return trans
+    if resamp:
+        # Resample the transmission to the
+        trans = resample(wvl, trans, wavelength, 0.0, 1.0)
+    return wvl, trans
