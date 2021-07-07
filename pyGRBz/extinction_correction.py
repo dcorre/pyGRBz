@@ -6,29 +6,27 @@ import sys
 import numpy as np
 from astropy.table import Column
 from pyGRBaglow.igm import madau, dla
-from pyGRBaglow.reddening import reddening
 
 # Import cythonised code if present
 try:
     from pyGRBaglow.igm_cy import meiksin
 except:
     from pyGRBaglow.igm import meiksin
+try:
+    from pyGRBaglow.reddening_cy import Pei92, gas_absorption
+except:
+    from pyGRBaglow.reddening import Pei92, gas_absorption
 
 
 def sed_extinction(
     wavelength,
     z,
     Av,
-    ext_law,
+    NHx=1,
+    ext_law="smc",
     Host_dust=True,
     Host_gas=False,
-    MW_dust=True,
-    MW_gas=False,
-    DLA=False,
     igm_att="Meiksin",
-    NHx=1,
-    NHI=20,
-    Av_local=0.1,
 ):
     """
     Computes the total transmission per wavelength at a given redshift.
@@ -57,16 +55,6 @@ def sed_extinction(
     Host_gas: boolean
         whether to apply photoelectric absorption by metals
 
-    MW_dust: boolean
-        whether to apply galactic extinction, i.e. in our galaxy
-
-    MW_gas: boolean
-        whether to apply photoelectric absorption from metals
-        in our galaxy
-
-    DLA: boolean
-        whether to apply a DLA at the provided redshift
-
     igm_att: string
         name of the IGM extinction model to use:
         'Meiksin' or 'Madau'
@@ -76,47 +64,29 @@ def sed_extinction(
     trans_tot: array
         total transmission on the line of sight
     """
-    #tt00 = time.time()
-    #  Make sure wavelength is an array
+    # tt00 = time.time()
+    # Make sure wavelength is an array
     wavelength = np.atleast_1d(wavelength)
 
-    # Optical extinction coefficient for our galaxy
-    # Default value
-    Av_local = Av_local
-
-    # Metal Column density in units of 1e22cm-2/mag
-    NHX = NHx
-
-    # Hydrogen column density at GRB redshift for DLA
-    NHI = NHI
-
     Trans_tot = np.ones(len(wavelength), dtype=np.float64)
-    #tt0 = time.time()
+    # tt0 = time.time()
     # ------------------------------------
-    #  Calculate extinction along the los
+    # Calculate extinction along the los
     # -------------------------------------
     if ext_law != "nodust" and Host_dust:
         # Transmission due to host galaxy reddening
-        Trans_tot *= reddening(wavelength, z, Av).Pei92(ext_law=ext_law)[1]
+        Trans_tot *= Pei92(wavelength, Av, z, ext_law=ext_law, Xcut=True)[1]
         # tt1 = time.time()
-
-    if MW_dust:
-        # Transmission due to local galactic reddening
-        Trans_tot *= reddening(wavelength, 0.0, Av_local).Pei92(ext_law="MW")[1]
 
     if Host_gas:
         # Transmission due to host galaxy gas extinction
-        Trans_tot *= reddening(wavelength, z, Av).gas_absorption(NHx=NHX)
+        Trans_tot *= gas_absorption(wavelength, z, NHx=NHx)
         # tt2 = time.time()
-
-    if MW_gas:
-        # Transmission due to local galactic gas extinction
-        Trans_tot *= reddening(wavelength, 0.0, Av_local).gas_absorption(NHx=0.2)
 
     if igm_att.lower() == "meiksin":
         # tt2 = time.time()
         # Add IGM attenuation using Meiksin 2006 model
-        Trans_tot *= meiksin(wavelength / 10.0, z, Xcut=True)
+        Trans_tot *= meiksin(wavelength / 10.0, z, unit="nm", Xcut=True)
         # tt3 = time.time()
     elif igm_att.lower() == "madau":
         # Add IGM attenuation using Madau 1995 model
@@ -127,10 +97,6 @@ def sed_extinction(
             "Model %s for IGM attenuation not known\n"
             'It should be either "Madau" or "Meiksin" ' % igm_att
         )
-
-    if DLA:
-        # Add DLA at GRB redshift
-        Trans_tot *= dla(wavelength, z, NHI)
 
     # print ("Extinction time dust: {:.2e}s".format(tt1-tt0))
     # print ("Extinction time gas: {:.2e}s".format(tt2-tt1))
