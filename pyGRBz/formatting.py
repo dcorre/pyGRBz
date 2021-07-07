@@ -109,7 +109,7 @@ def load_sys_response(data, path, wvl_step, wvl_step_X):
     sys_res_table.sort(["telescope", "wvl_eff"])
 
     new_wvl, sys_res_table = optimise_wvl_range(
-        sys_res_table, wavelength, wvl_step=50, wvl_step_X=10
+        sys_res_table, wavelength, wvl_step=wvl_step, wvl_step_X=wvl_step_X
     )
     return new_wvl, sys_res_table
 
