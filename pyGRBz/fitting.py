@@ -8,27 +8,17 @@ from scipy.special import erf
 from multiprocessing import Pool
 from astropy.table import Table, vstack
 from astropy.io import ascii
-from pyGRBz.models import Flux_template
 from pyGRBz.plotting import (
     plot_mcmc_evolution,
     plot_triangle,
     plot_mcmc_fit,
 )
 
-
-def sumbandflux(flux):
-    """ Sum the flux over a filter band """
-    # tt0 = time.time()
-    dwvl = np.gradient(wavelength_g)
-
-    mag = np.sum(flux * sys_response * dwvl, axis=1) / (
-        np.sum(sys_response * dwvl, axis=1)
-    )
-    # tt1 = time.time()
-
-    # print ("Summing flux in {:.2e}".format(tt1-tt0))
-    # print ("Summing flux 2 in {:.2e}".format(tt2-tt1))
-    return mag
+# Import cythonised code if present
+try:
+    from pyGRBz.fluxes_cy import compute_model_integrated_flux
+except:
+    from pyGRBz.fluxes import compute_model_integrated_flux
 
 
 def residuals(params, kind="mag"):
@@ -48,11 +38,12 @@ def residuals(params, kind="mag"):
             Av = 0
         else:
             z, beta, norm, Av = params
-    # print (y)
+
     # Calculate the Flux in microJansky for the given set of parameters and a
     # tt0 = time.time()
-    flux_model = Flux_template(
+    flux_model = compute_model_integrated_flux(
         wavelength_g,
+        sys_response,
         F0,
         wvl0,
         norm,
@@ -63,20 +54,14 @@ def residuals(params, kind="mag"):
         ext_law_g,
         Host_dust_g,
         Host_gas_g,
-        MW_dust_g,
-        MW_gas_g,
-        DLA_g,
         igm_att_g,
     )
     # tt1 = time.time()
-    # print ("Create flux in {:.2e}".format(tt1-tt0))
-
-    model = sumbandflux(flux_model)
-
+    # print ("Total time integrated flux: {:.2e}s".format(tt1-tt0))
     # for i in range(len(flux_obs)):
-    #    print (flux_obs[i], model[i], fluxerr_obs[i])
+    #    print (flux_obs[i], flux_model[i], fluxerr_obs[i])
 
-    return (flux_obs - model) / fluxerr_obs
+    return (flux_obs - flux_model) / fluxerr_obs
 
 
 def lnprior(params):
@@ -289,12 +274,12 @@ def get_data(sed, grb_info, mask):
 
     # Substract the galctic extinction
     # flux_corr = sed["flux"] - sed["ext_mag"]
-    flux_obs = np.array(sed["flux_corr"])
+    flux_obs = np.array(sed["flux_corr"], dtype=np.float64)
 
     # eff_wvl = np.array(sed["eff_wvl"])
-    fluxerr_obs = np.array(sed["flux_corr_err"])
+    fluxerr_obs = np.array(sed["flux_corr_err"], dtype=np.float64)
     # flux_corr_err = np.array(sed["flux_err"])
-    sys_response = np.array(sed["sys_response"])
+    sys_response = np.array(sed["sys_response"], dtype=np.float64)
 
     return (
         z_sim,
@@ -353,6 +338,13 @@ def sampler_run(
                     for i in range(nwalkers)
                 ]
             sampler.run_mcmc(pos, Nsteps2, progress=True)
+
+    print(
+        "\nAutocorrelation time: {0:.2f} steps".format(
+            sampler.get_autocorr_time(quiet=True)[0]
+        )
+    )
+    print ("\n")
 
     # Store the chains
     chain = sampler.chain
