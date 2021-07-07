@@ -6,7 +6,7 @@ import matplotlib.pyplot as plt
 from collections import OrderedDict
 from astropy.io import ascii
 import corner
-from pyGRBz.models import Flux_template, SPL_lc, BPL_lc
+from pyGRBz.fluxes import compute_model_flux, SPL_lc, BPL_lc
 
 
 def plot_lc_fit_check(
@@ -143,7 +143,7 @@ def plot_lc_fit_check(
         )
         if plot:
             plt.show()
-        #plt.close("all")
+        # plt.close("all")
 
 
 def plot_sed(seds, grb_info, plot, model, output_dir="/results/", filename_suffix=""):
@@ -218,7 +218,7 @@ def plot_sed(seds, grb_info, plot, model, output_dir="/results/", filename_suffi
         )
         if plot:
             plt.show()
-        #plt.close("all")
+        # plt.close("all")
 
 
 def plot_mcmc_evolution(
@@ -312,8 +312,8 @@ def plot_mcmc_evolution(
     )
     if plot:
         plt.show()
-    #plt.close(fig)
-    #plt.close("all")
+    # plt.close(fig)
+    # plt.close("all")
 
 
 def plot_triangle(
@@ -402,8 +402,8 @@ def plot_triangle(
     if plot:
         plt.show()
 
-    #plt.close(fig)
-    #plt.close("all")
+    # plt.close(fig)
+    # plt.close("all")
 
 
 def plot_mcmc_fit(
@@ -460,7 +460,7 @@ def plot_mcmc_fit(
         )
     )
 
-    flux_median = Flux_template(
+    flux_median = compute_model_flux(
         wavelength,
         F0,
         wvl0,
@@ -472,12 +472,9 @@ def plot_mcmc_fit(
         ext_law,
         Host_dust,
         Host_gas,
-        MW_dust,
-        MW_gas,
-        DLA,
         igm_att,
     )
-    flux_minL = Flux_template(
+    flux_minL = compute_model_flux(
         wavelength,
         F0,
         wvl0,
@@ -489,9 +486,6 @@ def plot_mcmc_fit(
         ext_law,
         Host_dust,
         Host_gas,
-        MW_dust,
-        MW_gas,
-        DLA,
         igm_att,
     )
     plt.figure()
@@ -596,7 +590,7 @@ def plot_mcmc_fit(
     )
     if plot:
         plt.show()
-    #plt.close("all")
+    # plt.close("all")
 
 
 def plot_zphot(
