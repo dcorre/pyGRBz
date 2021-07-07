@@ -5,8 +5,7 @@
 #cython: boundscheck=False, wraparound=False, initializedcheck=False, cdivision=True
 
 import numpy as np
-from pyGRBaglow import constants as cc
-from libc.math cimport pow, exp
+from libc.math cimport pow
 import cython
 from cython.parallel import prange, parallel
 from pyGRBaglow.reddening_cy import Pei92, gas_absorption
@@ -65,6 +64,7 @@ cpdef compute_model_flux(
     bint Host_gas=True,
     str igm_att="meiksin"
 ):
+    """Compute model flux at each given wavelength, with extincton."""
     cdef Py_ssize_t i
     cdef Py_ssize_t N = len(wvl)
     cdef double[:] flux = SPL_sed(wvl, F0, wvl0, norm, beta)
@@ -102,10 +102,11 @@ def compute_model_integrated_flux(
     bint Host_gas=True,
     str igm_att="meiksin"
 ):
+    """Integrate model flux through a system response using trapezoid method"""
     cdef Py_ssize_t i, j
     cdef Py_ssize_t N = len(wvl)
-    cdef double dwvl
     cdef Py_ssize_t N2 = sys_response.shape[0]
+    cdef double dwvl
     cdef double[:] flux_int = np.zeros(N2, dtype=np.float64)
     cdef double[:] a=np.zeros(N2, dtype=np.float64)
     cdef double[:] b=np.zeros(N2, dtype=np.float64)
