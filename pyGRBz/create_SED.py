@@ -12,7 +12,7 @@ import emcee
 from astropy.table import Table, vstack
 from astropy.io import ascii
 from pyGRBz.utils import mag2Jy, Jy2Mag
-from pyGRBz.models import Flux_template, BPL_lc, SPL_lc
+from pyGRBz.fluxes import compute_model_flux, BPL_lc, SPL_lc
 from pyGRBz.plotting import (
     plot_lc_fit_check,
     plot_sed,
