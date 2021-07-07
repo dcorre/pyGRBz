@@ -3,7 +3,29 @@
 
 """The setup script."""
 
-from setuptools import setup, find_packages
+import sys
+from setuptools import setup, find_packages, Extension
+from Cython.Build import cythonize
+
+# Lines adapted from https://github.com/sdpython/td3a_cpp
+if sys.platform.startswith("win"):
+    # windows
+    libraries = ['kernel32']
+    extra_compile_args = ['/EHsc', '/O2', '/Gy', '/openmp']
+    extra_link_args = None
+elif sys.platform.startswith("darwin"):
+    # mac osx
+    libraries = None
+    extra_compile_args = ['-lpthread', '-stdlib=libc++',
+                          '-mmacosx-version-min=10.7', '-Xpreprocessor',
+                          '-fopenmp']
+    extra_link_args = ["-lomp"]
+else:
+    # linux
+    libraries = ["m"]
+    extra_compile_args = ['-lpthread', '-fopenmp', "-ffast-math"]
+    extra_link_args = ['-lgomp', "-ffast-math", "-fopenmp"]
+
 
 with open('README.md') as readme_file:
     readme = readme_file.read()
@@ -19,7 +41,6 @@ requirements = [
         'jupyter',
         'astropy',
         'iminuit',
-        # 'emcee<3.0',
         'emcee',
         'corner',
         'sfdmap',
@@ -30,6 +51,14 @@ requirements = [
 setup_requirements = ['pytest-runner', 'numpy']
 
 test_requirements = ['pytest', ]
+
+extensions = [
+        Extension("pyGRBz.fluxes_cy",
+                  ["pyGRBz/fluxes_cy.pyx"],
+                  libraries=libraries,
+                  extra_compile_args=extra_compile_args,
+                  extra_link_args=extra_link_args),
+        ]
 
 setup(
     author="David Corre",
@@ -52,6 +81,7 @@ setup(
             'pyGRBz=pyGRBz.cli:main',
         ],
     },
+    ext_modules=cythonize(extensions),
     install_requires=requirements,
     license="MIT license",
     long_description=readme,
