@@ -188,29 +188,33 @@ def find_maximum_redshift(sed, mask_det):
     Take 10% of the value to be safer?
     """
 
-    #  Sed is already sorted by ascending effective wavelength
-    wvl_cutoff = (
-        float(sed["eff_wvl"][mask_det][0]) + float(sed["band_width"][mask_det][0]) / 2
-    )
-    priors_g["z"][1] = (wvl_cutoff / 912) - 1
-    print(
-        "Bluest band detection: %s/%s with eff_wvl=%.0f and bandwidth=%.0f (Angstroms).\n"
-        % (
-            sed["telescope"][mask_det][0],
-            sed["band"][mask_det][0],
-            sed["eff_wvl"][mask_det][0],
-            sed["band_width"][mask_det][0],
+    # Sed is already sorted by ascending effective wavelength
+    # Make another check to avoid X-ray data
+    mask_no_X = (mask_det) & (sed["eff_wvl"] > 1000)
+    if mask_no_X.any():
+        wvl_cutoff = (
+            float(sed["eff_wvl"][mask_no_X][0])
+            + float(sed["band_width"][mask_no_X][0]) / 2
         )
-    )
-    print(
-        "Assuming no flux can be observed below Lyman break "
-        "at 912 Angstroms\n"
-        "--> maximum allowed redshift is %.2f.\n" % (priors_g["z"][1])
-    )
-    print(
-        "This value is used to constrain the redshift parameter "
-        "space in the analysis below."
-    )
+        priors_g["z"][1] = (wvl_cutoff / 912) - 1
+        print(
+            "Bluest band detection: %s/%s with eff_wvl=%.0f and bandwidth=%.0f (Angstroms).\n"
+            % (
+                sed["telescope"][mask_det][0],
+                sed["band"][mask_det][0],
+                sed["eff_wvl"][mask_det][0],
+                sed["band_width"][mask_det][0],
+            )
+        )
+        print(
+            "Assuming no flux can be observed below Lyman break "
+            "at 912 Angstroms\n"
+            "--> maximum allowed redshift is %.2f.\n" % (priors_g["z"][1])
+        )
+        print(
+            "This value is used to constrain the redshift parameter "
+            "space in the analysis below."
+        )
 
 
 def set_initial_values(nwalkers, ndim):
@@ -344,7 +348,7 @@ def sampler_run(
             sampler.get_autocorr_time(quiet=True)[0]
         )
     )
-    print ("\n")
+    print("\n")
 
     # Store the chains
     chain = sampler.chain
