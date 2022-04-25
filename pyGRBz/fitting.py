@@ -128,6 +128,31 @@ def lnlike(params):
     return lnlik
 
 
+def chi2_comp(params):
+    """ Calculate the chi square associated to a flux. Return the chi square """
+    kind = "flux"
+    # Calculate the residuals: (obs - model)/obs_err for each band
+    res = residuals(params, kind=kind)
+
+    # cumulative distribution function of the residuals
+    if kind == "flux":
+        residuals_cdf = 0.5 * (1 + erf(-res / np.sqrt(2)))
+    elif kind == "mag":
+        residuals_cdf = 0.5 * (1 + erf(res / np.sqrt(2)))
+
+    # Survival function
+    residuals_edf = 1 - residuals_cdf
+    # residuals pdf
+    residuals_pdf = -0.5 * res ** 2
+
+    # detect is 1 if detections and 0 if no detection
+    mask = detection_flag == 1
+    lnlik = np.sum(residuals_pdf[mask])
+    chi2 = -2 * lnlik
+
+    return chi2
+
+
 def lnlik_C(yerr):
     """ constant term of the log likelihood expression """
     lnC = -0.5 * len(yerr) * np.log(2 * np.pi * yerr ** 2)
@@ -177,6 +202,90 @@ def AICc(k, yerr, best_lnlik):
     _AIC = AIC(k, yerr, best_lnlik)
     AICc = _AIC + 2 * k * (k + 1) / (n - k - 1)
     return AICc
+
+###
+def BIC(params, y, Host_gas_g, ext_law_g):
+    """  BIC criteria """ 
+    if Host_gas_g:
+        if ext_law_g == "nodust":
+            Av = 0
+            z = params['z']
+            beta = params['beta']
+            norm = params['norm']
+            NHx = params['NHx']
+            parameters = z, beta, norm, NHx
+        else:
+            z = params['z']
+            beta = params['beta']
+            Av = params['Av']
+            norm = params['norm']
+            NHx = params['NHx']
+            parameters = z, beta, norm, Av, NHx
+    else:
+        NHx = 0
+        if ext_law_g == "nodust":
+            Av = 0
+            z = params['z']
+            beta = params['beta']
+            norm = params['norm']
+            parameters = z, beta, norm
+        else:
+            z = params['z']
+            beta = params['beta']
+            Av = params['Av']
+            norm = params['norm']
+            parameters = z, beta, norm, Av
+
+    chi2 = chi2_comp(parameters)
+    k = len(parameters)
+    N = len(y)
+    bic = chi2 + k * np.log(N)
+    return bic
+###
+
+
+def BIC2(params, chi2, y, Host_gas_g, ext_law_g):
+    """  BIC criteria """ 
+    if Host_gas_g:
+        if ext_law_g == "nodust":
+            Av = 0
+            z = params['z']
+            beta = params['beta']
+            norm = params['norm']
+            NHx = params['NHx']
+            parameters = z, beta, norm, NHx
+        else:
+            z = params['z']
+            beta = params['beta']
+            Av = params['Av']
+            norm = params['norm']
+            NHx = params['NHx']
+            parameters = z, beta, norm, Av, NHx
+    else:
+        NHx = 0
+        if ext_law_g == "nodust":
+            Av = 0
+            z = params['z']
+            beta = params['beta']
+            norm = params['norm']
+            parameters = z, beta, norm
+        else:
+            z = params['z']
+            beta = params['beta']
+            Av = params['Av']
+            norm = params['norm']
+            parameters = z, beta, norm, Av
+
+    k = len(parameters)
+    N = len(y)
+    bic = chi2 + k * np.log(N)
+    return bic
+
+
+def reduced_chi2(chi2, y):
+    N = len(y)
+    chi2_reduced = chi2/(N-1)
+    return chi2_reduced
 
 
 def find_maximum_redshift(sed, mask_det):
@@ -645,6 +754,8 @@ def mcmc(
                     sed,
                     z_sim,
                     Av_sim,
+                    flux_obs,
+                    fluxerr_obs,
                 )
 
                 # Create plots
@@ -834,8 +945,11 @@ def compute_statistics(
     sed,
     z_sim,
     Av_sim,
+    flux_obs,
+    fluxerr_obs,
 ):
     """Compute statistics for the current run"""
+    
 
     #  Compute mean acceptance fraction
     mean_acceptance_fraction = np.mean(acceptance_fraction)
@@ -848,7 +962,6 @@ def compute_statistics(
     mask_nan = np.isfinite(lnproba_post_burn)
 
     best_chi2_val = return_bestlnproba(lnproba_post_burn, chains_post_burn)
-
     sum_proba = np.sum(np.exp(lnproba_post_burn[mask_nan]))
     mean_proba = np.mean(np.exp(lnproba_post_burn[mask_nan]))
     best_chi2 = (
@@ -857,6 +970,14 @@ def compute_statistics(
             np.unravel_index(np.nanargmax(lnproba_post_burn), lnproba_post_burn.shape)
         ]
     )
+    
+    # BIC computation
+    bic = BIC(best_chi2_val, flux_obs, Host_gas_g, ext_law_g)
+    bic2 = BIC2(best_chi2_val, best_chi2, flux_obs, Host_gas_g, ext_law_g)
+    
+    # Reduced chi2
+    chi2_reduced = reduced_chi2(best_chi2, flux_obs)
+
     print("\nMean Proba: %.2e" % mean_proba)
     print("Sum Proba: %.2e" % sum_proba)
 
@@ -1001,6 +1122,9 @@ def compute_statistics(
         [nb_bands],
         [nb_detected],
         [band_detected],
+        [bic],
+        [bic2],
+        [chi2_reduced]
     ]
     result_1_SED = Table(
         results_current_run,
@@ -1066,6 +1190,9 @@ def compute_statistics(
             "nb_bands",
             "nb_detection",
             "band_detected",
+            "bic",
+            "bic2",
+            "chi2_reduced",
         ],
         dtype=(
             "S10",
@@ -1129,6 +1256,9 @@ def compute_statistics(
             "i2",
             "i2",
             "S10",
+            "f8",
+            "f8",
+            "f8",
         ),
     )
     return result_1_SED, best_chi2_val
