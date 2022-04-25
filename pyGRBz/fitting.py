@@ -236,7 +236,6 @@ def BIC(params, y, Host_gas_g, ext_law_g):
             norm = params['norm']
             parameters = z, beta, norm, Av
 
-    print(parameters)
     chi2 = chi2_comp(parameters)
     k = len(parameters)
     N = len(y)
@@ -277,7 +276,6 @@ def BIC2(params, chi2, y, Host_gas_g, ext_law_g):
             norm = params['norm']
             parameters = z, beta, norm, Av
 
-    print(parameters)
     k = len(parameters)
     N = len(y)
     bic = chi2 + k * np.log(N)
@@ -949,8 +947,6 @@ def compute_statistics(
 ):
     """Compute statistics for the current run"""
     
-    print(flux_obs)
-    print(fluxerr_obs)
 
     #  Compute mean acceptance fraction
     mean_acceptance_fraction = np.mean(acceptance_fraction)
@@ -963,8 +959,6 @@ def compute_statistics(
     mask_nan = np.isfinite(lnproba_post_burn)
 
     best_chi2_val = return_bestlnproba(lnproba_post_burn, chains_post_burn)
-    print(len(best_chi2_val))
-    print(best_chi2_val)
     sum_proba = np.sum(np.exp(lnproba_post_burn[mask_nan]))
     mean_proba = np.mean(np.exp(lnproba_post_burn[mask_nan]))
     best_chi2 = (
@@ -976,7 +970,7 @@ def compute_statistics(
     
     # BIC computation
     bic = BIC(best_chi2_val, flux_obs, Host_gas_g, ext_law_g)
-    bic = BIC2(best_chi2_val, best_chi2, flux_obs, Host_gas_g, ext_law_g)
+    bic2 = BIC2(best_chi2_val, best_chi2, flux_obs, Host_gas_g, ext_law_g)
     
     # Reduced chi2
     chi2_reduced = reduced_chi2(best_chi2, flux_obs)
@@ -1126,6 +1120,7 @@ def compute_statistics(
         [nb_detected],
         [band_detected],
         [bic],
+        [bic2],
         [chi2_reduced]
     ]
     result_1_SED = Table(
@@ -1193,6 +1188,7 @@ def compute_statistics(
             "nb_detection",
             "band_detected",
             "bic",
+            "bic2",
             "chi2_reduced",
         ],
         dtype=(
@@ -1257,6 +1253,7 @@ def compute_statistics(
             "i2",
             "i2",
             "S10",
+            "f8",
             "f8",
             "f8",
         ),
