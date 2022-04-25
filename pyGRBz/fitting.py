@@ -676,6 +676,7 @@ def mcmc(
                     + ext_law
                     + filename_suffix
                     + ".dat",
+                    overwrite=True
                 )
 
                 results.append(result_1_SED)
@@ -693,13 +694,15 @@ def mcmc(
         ascii.write(
             np.array(list_notdetected),
             output_dir + "notdetected_" + ext_law + filename_suffix + ".dat",
+            overwrite=True
         )
 
     # If detections, write a result file
     if results:
         results = vstack(results)
         ascii.write(
-            results, output_dir + "best_fits_all_" + ext_law + filename_suffix + ".dat"
+            results, output_dir + "best_fits_all_" + ext_law + filename_suffix + ".dat",
+            overwrite=True
         )
 
 
