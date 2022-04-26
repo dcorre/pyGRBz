@@ -42,7 +42,7 @@ class Chi2Functor_lc:
         # notice that it accept variable length
         # positional arguments
         chi2 = sum(
-            ((y - self.f(t, *arg)) ** 2 / yerr ** 2)
+            ((y - self.f(t, *arg)) ** 2 / yerr**2)
             for t, y, yerr in zip(self.t, self.y, self.yerr)
         )
         # chi2 = sum((y-self.f(wvl,*arg))**2 for wvl,y in zip(self.wvl,self.y))
