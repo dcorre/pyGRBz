@@ -22,7 +22,7 @@ except:
 
 
 def residuals(params, kind="mag"):
-    """ Calculate the residuals, observations - models """
+    """Calculate the residuals, observations - models"""
 
     # Adapt the number of parameters in fonction of dust model and gas extinction
     if Host_gas_g:
@@ -65,7 +65,7 @@ def residuals(params, kind="mag"):
 
 
 def lnprior(params):
-    """ Set the allowed parameter range. Return the lnPrior """
+    """Set the allowed parameter range. Return the lnPrior"""
 
     # Adapt the number of parameters in fonction of dust model and gas extinction
     if Host_gas_g:
@@ -103,7 +103,7 @@ def lnprior(params):
 
 
 def lnlike(params):
-    """ Calculate the log likelihood. Return the lnLikelihood """
+    """Calculate the log likelihood. Return the lnLikelihood"""
     kind = "flux"
     # Calculate the residuals: (obs - model)/obs_err for each band
     res = residuals(params, kind=kind)
@@ -117,7 +117,7 @@ def lnlike(params):
     # Survival function
     residuals_edf = 1 - residuals_cdf
     # residuals pdf
-    residuals_pdf = -0.5 * res ** 2
+    residuals_pdf = -0.5 * res**2
 
     # detect is 1 if detections and 0 if no detection
     mask = detection_flag == 1
@@ -129,7 +129,7 @@ def lnlike(params):
 
 
 def chi2_comp(params):
-    """ Calculate the chi square associated to a flux. Return the chi square """
+    """Calculate the chi square associated to a flux. Return the chi square"""
     kind = "flux"
     # Calculate the residuals: (obs - model)/obs_err for each band
     res = residuals(params, kind=kind)
@@ -143,7 +143,7 @@ def chi2_comp(params):
     # Survival function
     residuals_edf = 1 - residuals_cdf
     # residuals pdf
-    residuals_pdf = -0.5 * res ** 2
+    residuals_pdf = -0.5 * res**2
 
     # detect is 1 if detections and 0 if no detection
     mask = detection_flag == 1
@@ -154,13 +154,13 @@ def chi2_comp(params):
 
 
 def lnlik_C(yerr):
-    """ constant term of the log likelihood expression """
-    lnC = -0.5 * len(yerr) * np.log(2 * np.pi * yerr ** 2)
+    """constant term of the log likelihood expression"""
+    lnC = -0.5 * len(yerr) * np.log(2 * np.pi * yerr**2)
     return lnC
 
 
 def lnprob(params):
-    """ Add lnPrior and lnLikelihood """
+    """Add lnPrior and lnLikelihood"""
 
     # Get the lnPrior
     lp = lnprior(params)
@@ -177,7 +177,7 @@ def lnprob(params):
 
 
 def dof(params, y):
-    """ Calculate the number of degrees of freedom """
+    """Calculate the number of degrees of freedom"""
     n = len(y)
     k = len(params)
     dof = n - k
@@ -185,55 +185,56 @@ def dof(params, y):
 
 
 def Likelihood(yerr, lnlik):
-    """ Compute the Likelihood from lnlik and lnlik_C """
+    """Compute the Likelihood from lnlik and lnlik_C"""
     L = np.exp(-2 * (lnlik_C(yerr) + lnlik))
     return L
 
 
 def AIC(k, yerr, best_lnlik):
-    """ AIC criteria """
+    """AIC criteria"""
     val = 2 * k - 2 * (lnlik_C(yerr) + best_lnlik)
     return val
 
 
 def AICc(k, yerr, best_lnlik):
-    """  AICc criteria """
+    """AICc criteria"""
     n = len(yerr)
     _AIC = AIC(k, yerr, best_lnlik)
     AICc = _AIC + 2 * k * (k + 1) / (n - k - 1)
     return AICc
 
+
 ###
 def BIC(params, y, Host_gas_g, ext_law_g):
-    """  BIC criteria """ 
+    """BIC criteria"""
     if Host_gas_g:
         if ext_law_g == "nodust":
             Av = 0
-            z = params['z']
-            beta = params['beta']
-            norm = params['norm']
-            NHx = params['NHx']
+            z = params["z"]
+            beta = params["beta"]
+            norm = params["norm"]
+            NHx = params["NHx"]
             parameters = z, beta, norm, NHx
         else:
-            z = params['z']
-            beta = params['beta']
-            Av = params['Av']
-            norm = params['norm']
-            NHx = params['NHx']
+            z = params["z"]
+            beta = params["beta"]
+            Av = params["Av"]
+            norm = params["norm"]
+            NHx = params["NHx"]
             parameters = z, beta, norm, Av, NHx
     else:
         NHx = 0
         if ext_law_g == "nodust":
             Av = 0
-            z = params['z']
-            beta = params['beta']
-            norm = params['norm']
+            z = params["z"]
+            beta = params["beta"]
+            norm = params["norm"]
             parameters = z, beta, norm
         else:
-            z = params['z']
-            beta = params['beta']
-            Av = params['Av']
-            norm = params['norm']
+            z = params["z"]
+            beta = params["beta"]
+            Av = params["Av"]
+            norm = params["norm"]
             parameters = z, beta, norm, Av
 
     chi2 = chi2_comp(parameters)
@@ -241,39 +242,41 @@ def BIC(params, y, Host_gas_g, ext_law_g):
     N = len(y)
     bic = chi2 + k * np.log(N)
     return bic
+
+
 ###
 
 
 def BIC2(params, chi2, y, Host_gas_g, ext_law_g):
-    """  BIC criteria """ 
+    """BIC criteria"""
     if Host_gas_g:
         if ext_law_g == "nodust":
             Av = 0
-            z = params['z']
-            beta = params['beta']
-            norm = params['norm']
-            NHx = params['NHx']
+            z = params["z"]
+            beta = params["beta"]
+            norm = params["norm"]
+            NHx = params["NHx"]
             parameters = z, beta, norm, NHx
         else:
-            z = params['z']
-            beta = params['beta']
-            Av = params['Av']
-            norm = params['norm']
-            NHx = params['NHx']
+            z = params["z"]
+            beta = params["beta"]
+            Av = params["Av"]
+            norm = params["norm"]
+            NHx = params["NHx"]
             parameters = z, beta, norm, Av, NHx
     else:
         NHx = 0
         if ext_law_g == "nodust":
             Av = 0
-            z = params['z']
-            beta = params['beta']
-            norm = params['norm']
+            z = params["z"]
+            beta = params["beta"]
+            norm = params["norm"]
             parameters = z, beta, norm
         else:
-            z = params['z']
-            beta = params['beta']
-            Av = params['Av']
-            norm = params['norm']
+            z = params["z"]
+            beta = params["beta"]
+            Av = params["Av"]
+            norm = params["norm"]
             parameters = z, beta, norm, Av
 
     k = len(parameters)
@@ -284,7 +287,7 @@ def BIC2(params, chi2, y, Host_gas_g, ext_law_g):
 
 def reduced_chi2(chi2, y):
     N = len(y)
-    chi2_reduced = chi2/(N-1)
+    chi2_reduced = chi2 / (N - 1)
     return chi2_reduced
 
 
@@ -488,7 +491,7 @@ def do_results_plots(
     output_dir,
     filename_suffix,
 ):
-    """ Create plots to analyse MCMC results"""
+    """Create plots to analyse MCMC results"""
 
     # Create evolution plot
     plot_mcmc_evolution(
@@ -609,7 +612,7 @@ def mcmc(
     priors=dict(z=[0, 11], Av=[0, 5], beta=[0, 3], NHx=[0.1, 100], norm=[0.8, 5]),
     adapt_z=True,
 ):
-    """ Compute the MCMC algorithm """
+    """Compute the MCMC algorithm"""
 
     # Set global variables
     # Need it for speeding multiproccesing
@@ -787,6 +790,16 @@ def mcmc(
                     + ext_law
                     + filename_suffix
                     + ".dat",
+                    overwrite=True,
+                )
+
+                # Write fluxes for best fit
+                save_best_fit_fluxes(
+                    best_chi2_val,
+                    output_dir,
+                    ext_law,
+                    str(sed["Name"][0]),
+                    filename_suffix,
                 )
 
                 results.append(result_1_SED)
@@ -804,14 +817,59 @@ def mcmc(
         ascii.write(
             np.array(list_notdetected),
             output_dir + "notdetected_" + ext_law + filename_suffix + ".dat",
+            overwrite=True,
         )
 
     # If detections, write a result file
     if results:
         results = vstack(results)
         ascii.write(
-            results, output_dir + "best_fits_all_" + ext_law + filename_suffix + ".dat"
+            results,
+            output_dir + "best_fits_all_" + ext_law + filename_suffix + ".dat",
+            overwrite=True,
         )
+
+
+def save_best_fit_fluxes(best_chi2_val, output_dir, ext_law, GRB_name, filename_suffix):
+    """Store fluxes of the best fit"""
+    # Calculate the Flux in microJansky for the given set of parameters and a
+    flux_model = compute_model_integrated_flux(
+        wavelength_g,
+        sys_response,
+        F0,
+        wvl0,
+        best_chi2_val["norm"],
+        best_chi2_val["beta"],
+        best_chi2_val["z"],
+        best_chi2_val["Av"],
+        best_chi2_val["NHx"],
+        ext_law_g,
+        Host_dust_g,
+        Host_gas_g,
+        igm_att_g,
+    )
+    fluxes_data = [flux for flux in flux_model]
+    labels = [f"Flux_model_band_{i+1}" for i in range(len(flux_model))]
+    for flux, err, det in zip(flux_obs, fluxerr_obs, detection_flag):
+        fluxes_data = fluxes_data + [flux, err, det]
+    for i in range(len(flux_model)):
+        labels = labels + [
+            f"Flux_obs_band_{i+1}",
+            f"Fluxerr_obs_band_{i+1}",
+            f"detection_obs_band_{i+1}",
+        ]
+    # Write fluxes for best fit
+    ascii.write(
+        np.array(fluxes_data),
+        output_dir
+        + GRB_name
+        + "/best_fit_fluxes_"
+        + ext_law
+        + filename_suffix
+        + ".dat",
+        names=labels,
+        overwrite=True,
+    )
 
 
 def clean_chains(chains, lnproba, chains_acc_frac, nburn, acceptance_frac_lim=0.15):
@@ -946,7 +1004,6 @@ def compute_statistics(
     fluxerr_obs,
 ):
     """Compute statistics for the current run"""
-    
 
     #  Compute mean acceptance fraction
     mean_acceptance_fraction = np.mean(acceptance_fraction)
@@ -967,11 +1024,11 @@ def compute_statistics(
             np.unravel_index(np.nanargmax(lnproba_post_burn), lnproba_post_burn.shape)
         ]
     )
-    
+
     # BIC computation
     bic = BIC(best_chi2_val, flux_obs, Host_gas_g, ext_law_g)
     bic2 = BIC2(best_chi2_val, best_chi2, flux_obs, Host_gas_g, ext_law_g)
-    
+
     # Reduced chi2
     chi2_reduced = reduced_chi2(best_chi2, flux_obs)
 
@@ -1121,7 +1178,7 @@ def compute_statistics(
         [band_detected],
         [bic],
         [bic2],
-        [chi2_reduced]
+        [chi2_reduced],
     ]
     result_1_SED = Table(
         results_current_run,
