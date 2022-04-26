@@ -88,7 +88,7 @@ class GRB_photoZ:
         )
 
     def formatting(self, dustrecalib="yes"):
-        """ set the data in the right format """
+        """set the data in the right format"""
 
         # Add the fluxes to the seds and convert vega in AB
         # magnitudes if needed
@@ -110,7 +110,7 @@ class GRB_photoZ:
         output_dir="/results/",
         filename_suffix="",
     ):
-        """ Extract the SED from LC if needed"""
+        """Extract the SED from LC if needed"""
 
         self.seds = extract_seds(
             self.data,
@@ -149,7 +149,7 @@ class GRB_photoZ:
         std_gaussianBall=1e-2,
         adapt_z=True,
     ):
-        """ Run the MCMC code """
+        """Run the MCMC code"""
         results = mcmc(
             self.seds,
             self.grb_info,

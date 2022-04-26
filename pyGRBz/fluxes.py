@@ -36,7 +36,7 @@ def BPL_sed(wvl, F0, norm, beta1, beta2, wvl1, s):
 def compute_model_flux(
     wvl, F0, wvl0, norm, beta, z, Av, NHx, ext_law, Host_dust, Host_gas, igm_att
 ):
-    """ Compute model flux over filter bands"""
+    """Compute model flux over filter bands"""
 
     Flux = SPL_sed(wvl, F0, wvl0, norm, beta) * sed_extinction(
         wvl,
@@ -66,7 +66,7 @@ def compute_model_integrated_flux(
     Host_gas,
     igm_att,
 ):
-    """ Compute and integrate model flux over filter bands"""
+    """Compute and integrate model flux over filter bands"""
     # tt0 = time.time()
     flux = compute_model_flux(
         wavelength,

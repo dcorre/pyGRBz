@@ -331,7 +331,7 @@ def plot_triangle(
     output_dir="/test/",
     priors=dict(z=[0, 11], Av=[0, 2], beta=[0, 2], NHx=[0.1, 100], norm=[0, 10]),
 ):
-    """ Plot the triangle """
+    """Plot the triangle"""
     if ext_law == "nodust" and Host_gas is False:
         labels = ["z", "beta", "norm"]
         truths = [z_sim, beta_sim, -1]
