@@ -8,7 +8,7 @@ import numpy as np
 from libc.math cimport pow
 import cython
 from cython.parallel import prange, parallel
-from pyGRBaglow.reddening_cy import Pei92, gas_absorption
+from pyGRBaglow.reddening_cy import Pei92, sne, gas_absorption
 from pyGRBaglow.igm_cy import meiksin
 
 
@@ -73,7 +73,10 @@ cpdef compute_model_flux(
     cdef double[:] Trans_gas = np.empty(N, dtype=np.float64)
 
     if Host_dust:
-        Trans_dust = Pei92(wvl, Av, z, ext_law=ext_law, Xcut=True)[1]
+        if ext_law == "sne":
+            Trans_dust = sne(wvl, Av, z, Xcut=True)[1]
+        else:
+            Trans_dust = Pei92(wvl, Av, z, ext_law=ext_law, Xcut=True)[1]
     if Host_gas:
         Trans_gas = gas_absorption(wvl, z , NHx=NHx)
     

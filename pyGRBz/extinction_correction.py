@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-#import time
+# import time
 import sys
 import numpy as np
 from astropy.table import Column
@@ -13,9 +13,9 @@ try:
 except:
     from pyGRBaglow.igm import meiksin
 try:
-    from pyGRBaglow.reddening_cy import Pei92, gas_absorption
+    from pyGRBaglow.reddening_cy import Pei92, sne, gas_absorption
 except:
-    from pyGRBaglow.reddening import Pei92, gas_absorption
+    from pyGRBaglow.reddening import Pei92, sne, gas_absorption
 
 
 def sed_extinction(
@@ -75,7 +75,10 @@ def sed_extinction(
     # -------------------------------------
     if ext_law != "nodust" and Host_dust:
         # Transmission due to host galaxy reddening
-        Trans_tot *= Pei92(wavelength, Av, z, ext_law=ext_law, Xcut=True)[1]
+        if ext_law == "sne":
+            Trans_tot *= sne(wavelength, Av, z, Xcut=True)[1]
+        else:
+            Trans_tot *= Pei92(wavelength, Av, z, ext_law=ext_law, Xcut=True)[1]
         # tt1 = time.time()
 
     if Host_gas:
